@@ -95,11 +95,12 @@ function commitAndPush(message) {
   const staged = git('diff', '--cached', '--name-only').trim();
   if (!staged) return false;
   git('-c', 'user.name=turkey-bowl-bot', '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com', 'commit', '-m', message);
+  const branch = process.env.GITHUB_REF_NAME || git('rev-parse', '--abbrev-ref', 'HEAD').trim();
   try {
-    git('push');
+    git('push', 'origin', `HEAD:refs/heads/${branch}`);
   } catch {
-    git('pull', '--rebase');
-    git('push');
+    git('pull', '--rebase', 'origin', branch);
+    git('push', 'origin', `HEAD:refs/heads/${branch}`);
   }
   return true;
 }

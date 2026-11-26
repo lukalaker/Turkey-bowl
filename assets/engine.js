@@ -333,7 +333,6 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
     league.status = 'drafting';
     league.completedAt = null;
     const p = players.find((x) => x.id === last.player);
-    const t = league.teams.find((x) => x.id === last.team);
     return done(`Undid pick ${league.picks.length + 1}: ${p?.name ?? last.player} is back in the pool.\n\n${clockMessage(league)}`);
   }
 
@@ -345,7 +344,7 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
     const team = onClock(league);
     if (!sameUser(team.owner, author) && !isCommish) {
       if (!own) return fail(`You're not in this league. It's ${team.name}'s turn.`);
-      return fail(`It's not your turn. ${team.name} is on the clock (${mention(league, team)}).`);
+      return fail(`It's not your turn. ${team.name} is on the clock.`);
     }
     const player = findPlayer(players, arg);
     if (!player) return fail(`I couldn't find "${arg}" in the Thanksgiving player pool. Use the Draft button on the website so the name matches exactly.`);
