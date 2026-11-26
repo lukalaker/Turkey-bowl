@@ -228,3 +228,15 @@ test('commissioner can add a team for someone without GitHub and picks for them'
   assert.ok(r.ok, r.message);
   assert.match(r.message, /Grandma drafts Jahmyr Gibbs/);
 });
+
+test('RESET ALL wipes test teams and picks back to an empty league', () => {
+  const { L, run } = league3();
+  run('pick', 'Josh Allen', onClock(L).owner);
+  assert.equal(run('reset', 'all', 'aunt').ok, false);
+  const r = run('reset', 'ALL', 'commish');
+  assert.ok(r.ok, r.message);
+  assert.equal(L.status, 'signup');
+  assert.equal(L.teams.length, 0);
+  assert.equal(L.picks.length, 0);
+  assert.ok(run('join', 'Gravy Train', 'commish').ok);
+});

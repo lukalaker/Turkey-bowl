@@ -512,7 +512,7 @@ function renderRules() {
     <section><h3>Commissioner tools</h3>
       <p>The commissioner (@${esc(L.commissioner)}) runs the league by opening issues with these titles:</p>
       <p><code>ADD: Grandma's Gravy Boat</code> adds a team the commissioner drafts for. <code>ADD: Team name @username</code> saves a seat for someone on GitHub.</p>
-      <p><code>KICK: Team name</code> removes a team before the draft. <code>UNDO</code> takes back the last pick. <code>RESET</code> clears the draft and redraws the order.</p>
+      <p><code>KICK: Team name</code> removes a team before the draft. <code>UNDO</code> takes back the last pick. <code>RESET</code> clears the draft and redraws the order. <code>RESET ALL</code> removes every team and pick so you can start over.</p>
       <p>The commissioner can also submit a pick for whichever team is on the clock.</p></section>
   </div>`;
 }

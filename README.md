@@ -42,6 +42,7 @@ The repo owner is the commissioner. Run the league by opening an issue with one 
 | `PICK: Player name` | Picks for whichever team is on the clock |
 | `UNDO` | Takes back the last pick |
 | `RESET` | Clears all picks and draws a new draft order |
+| `RESET ALL` | Removes every team and pick (use after testing) |
 
 Anyone can open a `JOIN:` issue while seats are open. If a stranger grabs a seat, `KICK` them.
 

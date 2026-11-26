@@ -315,6 +315,10 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
 
   if (kind === 'reset') {
     if (!isCommish) return fail('Only the commissioner can reset the draft.');
+    if (/^(all|league|everything)$/i.test(arg)) {
+      Object.assign(league, { status: 'signup', teams: [], order: [], turn: 0, picks: [], passes: [], startedAt: null, completedAt: null });
+      return done('League wiped. All teams and picks are gone and every seat is open again.');
+    }
     if (league.teams.length >= league.maxTeams) {
       startDraft(league, players, atMs, rng);
       const order = league.order.map((id, i) => `${i + 1}. ${league.teams.find((t) => t.id === id).name}`).join('\n');
