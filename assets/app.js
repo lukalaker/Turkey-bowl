@@ -39,6 +39,7 @@ const S = {
 };
 
 const POSITIONS = ['ALL', 'QB', 'RB', 'WR', 'TE', 'FLEX', 'K', 'DEF'];
+const DRUMSTICK = `<svg class="drumstick" viewBox="0 0 32 32" aria-hidden="true"><path d="M14 18 6.8 25.2" stroke="#fff4e4" stroke-width="3.6" stroke-linecap="round"/><circle cx="4.6" cy="24.8" r="2.6" fill="#fff4e4"/><circle cx="7.2" cy="27.4" r="2.6" fill="#fff4e4"/><ellipse cx="20.2" cy="11.8" rx="10.2" ry="8.2" transform="rotate(-45 20.2 11.8)" fill="#c8741f"/><ellipse cx="22.6" cy="8.8" rx="4.4" ry="2.3" transform="rotate(-45 22.6 8.8)" fill="#eaa456"/></svg>`;
 const FILTER_LABEL = { ALL: 'All', FLEX: 'Flex', DEF: 'D/ST' };
 
 /* ---------- helpers ---------- */
@@ -218,8 +219,9 @@ function scoreboardHTML(st, mode) {
             : x.s.toPlay
               ? `${x.s.toPlay} still to play`
               : 'Everyone has played';
-      return `<li class="${val(x) === top && top > 0 ? 'leader' : ''}" data-color="${esc(x.t.color)}">
-        <span class="sb-rank">${i + 1}</span>
+      const leads = val(x) === top && top > 0;
+      return `<li class="${leads ? 'leader' : ''}" data-color="${esc(x.t.color)}">
+        <span class="sb-rank">${leads ? `${DRUMSTICK}<span class="sr-only">Leader</span>` : i + 1}</span>
         <span class="sb-name">${esc(x.t.name)}<small>${sub}</small></span>
         <span class="sb-pts">${pts(val(x))}</span></li>`;
     })
@@ -238,7 +240,7 @@ function renderHero() {
       .map((t) => ({ t, s: teamScore(t) }))
       .sort((a, b) => b.s.total - a.s.total);
     const tied = ranked.length > 1 && Math.abs(ranked[0].s.total - ranked[1].s.total) < 0.005;
-    el.innerHTML = `<p class="winner-line">${tied ? 'A tie! Split the pie.' : `🏆 ${esc(ranked[0].t.name)} wins the Turkey Bowl`}</p>${scoreboardHTML(st, 'final')}`;
+    el.innerHTML = `<p class="winner-line">${tied ? 'A tie! Split the pie.' : `${DRUMSTICK}${esc(ranked[0].t.name)} wins the Turkey Bowl`}</p>${scoreboardHTML(st, 'final')}`;
     return;
   }
   if (ph === 'live') {
@@ -247,7 +249,7 @@ function renderHero() {
   }
   if (ph === 'signup') {
     const n = L.teams.length;
-    el.innerHTML = `<p class="hero-tagline">Three teams, one day of football, winner takes all. <strong>${n} of ${L.maxTeams}</strong> teams are in. First kickoff ${first ? fmtTime(first.kickoff) : ''}.</p>`;
+    el.innerHTML = `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>${n} of ${L.maxTeams}</strong> seats are taken. First kickoff ${first ? fmtTime(first.kickoff) : ''}.</p>`;
     return;
   }
   if (ph === 'drafting') {
@@ -317,8 +319,10 @@ function playerRows() {
       const inj = p.injury ? ` <span class="inj">${esc(p.injury)}</span>` : '';
       return `<li class="player${owner ? ' taken' : ''}${S.flash === p.id ? ' flash' : ''}">
         ${avatar(p)}
-        <div><div class="pname">${esc(p.name)}</div><div class="pmeta"><span class="pos-tag">${POS_LABEL[p.pos]}</span>${matchup(p)}${inj}</div></div>
-        <div class="price">$${p.salary}<small>${pts(p.proj)} proj</small></div>
+        <div class="pbody">
+          <div class="pline"><span class="pname">${esc(p.name)}</span><span class="leader" aria-hidden="true"></span><span class="price">$${p.salary}</span></div>
+          <div class="pmeta"><span class="pos-tag">${POS_LABEL[p.pos]}</span>${matchup(p)}, ${pts(p.proj)} proj${inj}</div>
+        </div>
         <div class="row-action">${action}</div></li>`;
     })
     .join('');
@@ -341,12 +345,12 @@ function topHTML() {
       const t = L.teams[i];
       seats.push(
         t
-          ? `<li data-color="${esc(t.color)}" style="border-left-color:var(--team)"><b>${esc(t.name)}</b>${t.owner ? `@${esc(t.owner)}` : 'Commissioner drafts'}</li>`
-          : `<li class="empty"><b>Open seat</b>Waiting for a family member</li>`,
+          ? `<li data-color="${esc(t.color)}"><b>${esc(t.name)}</b><span>${t.owner ? `@${esc(t.owner)}` : 'Commissioner drafts'}</span></li>`
+          : `<li class="empty"><b>Open seat</b><span>Waiting for a family member</span></li>`,
       );
     }
     return `<section class="section join panel">
-        <div><h2>Join the league</h2>
+        <div><h2>Take a seat at the table</h2>
         <p class="lede">Name your team and claim a seat. When all ${L.maxTeams} seats are taken, the draft order is drawn at random and the draft opens.</p></div>
         <form id="join-form">
           <label class="sr-only" for="team-name">Team name</label>
@@ -356,7 +360,7 @@ function topHTML() {
         <p class="hint">You need a free GitHub account. GitHub opens with your team filled in; tap Submit and you're in within a minute. No GitHub? Ask the commissioner, @${esc(L.commissioner)}, to add your team.</p>
         <ul class="seats">${seats.join('')}</ul>
       </section>
-      <section class="section"><h2>The player pool</h2><p class="lede">Prices are set. Plan your team while the seats fill up.</p></section>`;
+      <section class="section"><h2>Players and prices</h2><p class="lede">Prices are set. Plan your plate while the seats fill up.</p></section>`;
   }
   if (L.status === 'complete') {
     return `<section class="section"><h2>Draft complete</h2><p class="lede">Every team is set. Watch the scores on the Teams tab once the games start.</p></section>`;
@@ -455,7 +459,9 @@ function renderTeams() {
         const pt = pointsFor(p, S.scored);
         const gs = gameState(gameOf(p));
         const right = started
-          ? `<span class="pts">${gs === 'pre' ? '–' : pts(pt?.pts)}<small>${gs === 'pre' ? fmtTime(p.kickoff) : gs === 'in' ? 'Playing' : 'Final'}</small></span>`
+          ? gs === 'pre'
+            ? `<span class="pts">–<small>${fmtTime(p.kickoff)}</small></span>`
+            : `<button type="button" class="pts pts-btn" data-points="${esc(p.id)}" aria-label="${esc(p.name)}: ${pts(pt?.pts)} points. Show how.">${pts(pt?.pts)}<small>${gs === 'in' ? 'Playing' : 'Final'}</small></button>`
           : `<span class="pts">$${r.pick.salary}<small>${pts(p.proj)} proj</small></span>`;
         const line = started && pt?.line ? esc(pt.line) : `${esc(p.team)} ${POS_LABEL[p.pos]}, ${matchup(p).replace(/^\w+ /, '')}`;
         return `<li><span class="slot">${POS_LABEL[r.slot]}</span><div class="who"><b>${esc(p.name)}</b><span>${line}</span></div>${right}</li>`;
@@ -468,7 +474,7 @@ function renderTeams() {
       <div class="team-head"><div><h3>${esc(t.name)}</h3><small>${t.owner ? `@${esc(t.owner)}` : 'Commissioner drafts'}</small></div>${total}</div>
       <ul class="roster">${rows}</ul></article>`;
   });
-  $('#view').innerHTML = `<h2>Teams</h2><p class="lede">${started ? 'Points update every 30 seconds while games are on.' : 'Rosters fill in as the draft goes.'}</p><div class="team-grid">${cards.join('')}</div>`;
+  $('#view').innerHTML = `<h2>Teams</h2><p class="lede">${started ? 'Points update every 30 seconds while games are on. Tap a score to see how it was earned.' : 'Rosters fill in as the draft goes.'}</p><div class="team-grid">${cards.join('')}</div>`;
 }
 
 /* ---------- rules view ---------- */
@@ -544,6 +550,29 @@ function openPickSheet(playerId) {
   $('#sheet').showModal();
 }
 
+function openPointsSheet(playerId) {
+  const p = S.byId[playerId];
+  if (!p) return;
+  const pt = pointsFor(p, S.scored) ?? { pts: 0, breakdown: [] };
+  const ownerId = S.league.picks.find((x) => x.player === playerId)?.team;
+  const owner = ownerId ? teamById(ownerId) : null;
+  const g = gameOf(p);
+  const b = g ? S.board[g.id] : null;
+  const status = b?.state === 'post' ? 'Final' : b?.detail || 'In progress';
+  const rows = (pt.breakdown ?? [])
+    .map((r) => `<tr><td>${esc(r.label)}</td><td>${esc(r.detail)}</td><td>${r.pts > 0 ? '+' : ''}${pts(r.pts)}</td></tr>`)
+    .join('');
+  $('#sheet-body').innerHTML = `<h2 id="sheet-title">${esc(p.name)}</h2>
+    <p class="hint">${esc(p.team)} ${POS_LABEL[p.pos]}${owner ? ` on ${esc(owner.name)}` : ''}. ${esc(g?.short ?? '')}, ${esc(status)}.</p>
+    ${
+      rows
+        ? `<table class="breakdown"><tbody>${rows}</tbody><tfoot><tr><td colspan="2">Total</td><td>${pts(pt.pts)}</td></tr></tfoot></table>`
+        : `<p>No points yet. Nothing in the box score for ${esc(p.name)} so far.</p>`
+    }
+    <div class="actions"><button class="btn quiet" value="close">Close</button></div>`;
+  $('#sheet').showModal();
+}
+
 function waitingSheet(text) {
   $('#sheet-body').innerHTML = `<h2 id="sheet-title">Waiting for the league bot</h2><p>${esc(text)}</p>
     <p class="hint">If GitHub says something went wrong, the bot's reply on your issue explains why.</p>
@@ -584,6 +613,8 @@ function bind() {
   view.addEventListener('click', (e) => {
     const draft = e.target.closest('[data-draft]');
     if (draft) return openPickSheet(draft.dataset.draft);
+    const points = e.target.closest('[data-points]');
+    if (points) return openPointsSheet(points.dataset.points);
     const me = e.target.closest('[data-me]');
     if (me) {
       S.me = S.me === me.dataset.me ? '' : me.dataset.me;

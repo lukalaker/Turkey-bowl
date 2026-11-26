@@ -123,6 +123,23 @@ export function scoreSummary(summary) {
       const pr = cats.puntReturns?.[id] ?? {};
       const kick = cats.kicking?.[id] ?? {};
       const retTd = (kr.kickReturnTouchdowns ?? 0) + (pr.puntReturnTouchdowns ?? 0);
+      const breakdown = [];
+      const add = (label, value, rate, unit = '') => {
+        if (!value) return;
+        breakdown.push({ label, detail: `${fmt(value)}${unit ? ` ${unit}` : ''} × ${rate}`, pts: round2(value * rate) });
+      };
+      add('Passing yards', pass.passingYards, RULES.passYd, 'yds');
+      add('Passing TDs', pass.passingTouchdowns, RULES.passTd);
+      add('Interceptions thrown', pass.interceptions, RULES.passInt);
+      add('Rushing yards', rush.rushingYards, RULES.rushYd, 'yds');
+      add('Rushing TDs', rush.rushingTouchdowns, RULES.rushTd);
+      add('Receptions', recv.receptions, RULES.rec);
+      add('Receiving yards', recv.receivingYards, RULES.recYd, 'yds');
+      add('Receiving TDs', recv.receivingTouchdowns, RULES.recTd);
+      add('Kick or punt return TDs', retTd, RULES.returnTd);
+      add('Fumbles lost', fum.fumblesLost, RULES.fumLost);
+      add('Field goals made', kick.fieldGoalsMade, RULES.fg);
+      add('Extra points made', kick.extraPointsMade, RULES.xp);
       const pts =
         (pass.passingYards ?? 0) * RULES.passYd +
         (pass.passingTouchdowns ?? 0) * RULES.passTd +
@@ -156,7 +173,7 @@ export function scoreSummary(summary) {
       if (kick.fieldGoalAttempts || kick.extraPointAttempts) {
         parts.push(`${kick.fieldGoalsMade ?? 0}/${kick.fieldGoalAttempts ?? 0} FG, ${kick.extraPointsMade ?? 0}/${kick.extraPointAttempts ?? 0} XP`);
       }
-      result.players[id] = { pts: round2(pts), line: parts.join(', ') };
+      result.players[id] = { pts: round2(pts), line: parts.join(', '), breakdown };
     }
   }
 
@@ -185,12 +202,22 @@ export function scoreSummary(summary) {
     const pts =
       sacks * RULES.dstSack + ints * RULES.dstInt + fumRec * RULES.dstFumRec + (defTd + retTd) * RULES.dstTd + pa;
 
+    const tier = POINTS_ALLOWED.findIndex(([max]) => allowed <= max);
+    const lo = tier <= 0 ? 0 : POINTS_ALLOWED[tier - 1][0] + 1;
+    const hi = POINTS_ALLOWED[tier][0];
+    const range = lo === hi ? `${lo}` : hi === Infinity ? `${lo}+` : `${lo}-${hi}`;
+    const breakdown = [{ label: 'Points allowed', detail: `${allowed} (${range} tier)`, pts: pa }];
+    const add = (label, value, rate) => value && breakdown.push({ label, detail: `${fmt(value)} × ${rate}`, pts: round2(value * rate) });
+    add('Sacks', sacks, RULES.dstSack);
+    add('Interceptions', ints, RULES.dstInt);
+    add('Fumble recoveries', fumRec, RULES.dstFumRec);
+    add('Defense and return TDs', defTd + retTd, RULES.dstTd);
     const parts = [`${allowed} pts allowed`];
     if (sacks) parts.push(`${sacks} sack${sacks === 1 ? '' : 's'}`);
     if (ints) parts.push(`${ints} INT`);
     if (fumRec) parts.push(`${fumRec} fum rec`);
     if (defTd + retTd) parts.push(`${defTd + retTd} TD`);
-    result.dst[abbr] = { pts: round2(pts), line: parts.join(', ') };
+    result.dst[abbr] = { pts: round2(pts), line: parts.join(', '), breakdown };
   }
   return result;
 }
@@ -199,8 +226,8 @@ export function scoreSummary(summary) {
 export function pointsFor(player, scoredGames) {
   const g = scoredGames?.[player.game];
   if (!g) return null;
-  if (player.pos === 'DEF') return g.dst?.[player.team] ?? (g.state === 'pre' ? null : { pts: 0, line: '' });
-  return g.players?.[player.id] ?? (g.state === 'pre' ? null : { pts: 0, line: 'No stats yet' });
+  if (player.pos === 'DEF') return g.dst?.[player.team] ?? (g.state === 'pre' ? null : { pts: 0, line: '', breakdown: [] });
+  return g.players?.[player.id] ?? (g.state === 'pre' ? null : { pts: 0, line: 'No stats yet', breakdown: [] });
 }
 
 export async function fetchSummary(gameId, fetchImpl = fetch) {

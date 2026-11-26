@@ -4,7 +4,7 @@
 
 export const SLOTS = ['QB', 'RB', 'RB', 'WR', 'WR', 'TE', 'FLEX', 'K', 'DEF'];
 export const FLEX_POSITIONS = ['RB', 'WR', 'TE'];
-export const TEAM_COLORS = ['cranberry', 'gold', 'slate'];
+export const TEAM_COLORS = ['cranberry', 'pumpkin', 'avocado'];
 export const POS_LABEL = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE', FLEX: 'Flex', K: 'K', DEF: 'D/ST' };
 
 const sameUser = (a, b) => !!a && !!b && a.toLowerCase() === b.toLowerCase();

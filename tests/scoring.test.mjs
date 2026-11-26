@@ -59,5 +59,22 @@ test('pregame summaries give no points (and no free shutout points)', () => {
 test('a rostered player with no stats in a live game scores 0', () => {
   const s = scoreSummary(final);
   const games = { x: s };
-  assert.deepEqual(pointsFor({ id: 'nobody', pos: 'WR', team: 'DET', game: 'x' }, games), { pts: 0, line: 'No stats yet' });
+  assert.deepEqual(pointsFor({ id: 'nobody', pos: 'WR', team: 'DET', game: 'x' }, games), { pts: 0, line: 'No stats yet', breakdown: [] });
+});
+
+test('every player and defense gets a line-by-line breakdown that adds up', () => {
+  const s = scoreSummary(final);
+  const gibbs = s.players['4429795'];
+  assert.deepEqual(gibbs.breakdown, [
+    { label: 'Rushing yards', detail: '98 yds × 0.1', pts: 9.8 },
+    { label: 'Rushing TDs', detail: '2 × 6', pts: 12 },
+    { label: 'Receptions', detail: '4 × 1', pts: 4 },
+    { label: 'Receiving yards', detail: '20 yds × 0.1', pts: 2 },
+  ]);
+  for (const p of [...Object.values(s.players), ...Object.values(s.dst)]) {
+    const sum = Math.round(p.breakdown.reduce((a, b) => a + b.pts, 0) * 100) / 100;
+    assert.ok(Math.abs(sum - p.pts) < 0.011, `${p.line}: ${sum} vs ${p.pts}`);
+  }
+  assert.deepEqual(s.dst.DET.breakdown[0], { label: 'Points allowed', detail: '21 (21-27 tier)', pts: 0 });
+  assert.deepEqual(s.dst.DET.breakdown[1], { label: 'Sacks', detail: '4 × 1', pts: 4 });
 });
