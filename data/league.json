@@ -1,0 +1,27 @@
+{
+  "name": "Turkey Bowl",
+  "repo": "lukalaker/Turkey-bowl",
+  "commissioner": "lukalaker",
+  "cap": 100,
+  "maxTeams": 3,
+  "slots": [
+    "QB",
+    "RB",
+    "RB",
+    "WR",
+    "WR",
+    "TE",
+    "FLEX",
+    "K",
+    "DEF"
+  ],
+  "status": "signup",
+  "teams": [],
+  "order": [],
+  "turn": 0,
+  "picks": [],
+  "passes": [],
+  "startedAt": null,
+  "completedAt": null,
+  "updatedAt": null
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Turkey Bowl 2026</title>
+    <meta name="description" content="A one-day, three-team Thanksgiving fantasy football league. Salary draft, every player on one team only, winner takes all." />
+    <meta name="theme-color" content="#1E5631" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦃</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=Graduate&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <script type="module" src="assets/app.js"></script>
+  </head>
+  <body>
+    <header class="field" id="hero">
+      <div class="field-inner">
+        <h1 class="wordmark"><span>Turkey</span> <span>Bowl</span></h1>
+        <div id="hero-body" class="hero-body" aria-live="polite">
+          <p class="hero-tagline">Loading the league…</p>
+        </div>
+      </div>
+      <ol class="games" id="games" aria-label="Thanksgiving games"></ol>
+    </header>
+
+    <nav class="tabs" aria-label="Sections">
+      <button type="button" data-tab="players" aria-current="page">Players</button>
+      <button type="button" data-tab="board">Draft board</button>
+      <button type="button" data-tab="teams">Teams</button>
+      <button type="button" data-tab="rules">How to play</button>
+    </nav>
+
+    <main id="view" class="view"></main>
+
+    <dialog id="sheet" class="sheet" aria-labelledby="sheet-title">
+      <form method="dialog" id="sheet-body"></form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <noscript><p class="noscript">The Turkey Bowl board needs JavaScript turned on.</p></noscript>
+  </body>
+</html>

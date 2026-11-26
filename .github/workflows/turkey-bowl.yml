@@ -1,0 +1,63 @@
+name: Turkey Bowl bot
+
+# Every pick is a GitHub issue. This workflow reads new issues, records the
+# pick in data/league.json, replies on the issue, and redeploys the website.
+# During the Thanksgiving games it also saves box scores every 5 minutes.
+on:
+  issues:
+    types: [opened, reopened, edited]
+  schedule:
+    - cron: '*/5 17-23 26 11 *' # Thanksgiving, 12pm-7pm ET
+    - cron: '*/5 0-5 27 11 *' # Thanksgiving night game
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+# One run at a time so two picks can never collide.
+concurrency:
+  group: turkey-bowl
+  cancel-in-progress: false
+
+jobs:
+  league:
+    if: github.event_name != 'push' || github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.bot.outputs.changed == 'true' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test the draft rules
+        if: github.event_name == 'push'
+        run: npm test
+      - name: Run the league bot
+        id: bot
+        run: node scripts/run.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the website
+        run: |
+          mkdir _site
+          cp -r index.html assets data _site/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: league
+    if: needs.league.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

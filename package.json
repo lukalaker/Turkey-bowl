@@ -1,0 +1,10 @@
+{
+  "name": "turkey-bowl",
+  "private": true,
+  "type": "module",
+  "description": "A one-day, three-team Thanksgiving fantasy football league run from a GitHub repo.",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "players": "node scripts/build-players.mjs"
+  }
+}
