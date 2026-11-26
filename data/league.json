@@ -41,10 +41,21 @@
     "t3",
     "t2"
   ],
-  "turn": 0,
-  "picks": [],
+  "turn": 1,
+  "picks": [
+    {
+      "n": 1,
+      "turn": 0,
+      "team": "t1",
+      "player": "4241389",
+      "slot": "WR",
+      "salary": 17,
+      "by": "lukalaker",
+      "at": "2026-11-26T02:49:30.000Z"
+    }
+  ],
   "passes": [],
   "startedAt": "2026-11-26T02:48:28.000Z",
   "completedAt": null,
-  "updatedAt": "2026-11-26T02:48:28.000Z"
+  "updatedAt": "2026-11-26T02:49:30.000Z"
 }
