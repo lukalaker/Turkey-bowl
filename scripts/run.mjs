@@ -105,6 +105,23 @@ function commitAndPush(message) {
   return true;
 }
 
+/** Live mode: someone used an old tab that still files GitHub issues. Point them at the live site. */
+async function redirectIssues() {
+  if (!token || !repo) return [];
+  const issues = await api('GET', '/issues?state=open&sort=created&direction=asc&per_page=100');
+  const out = [];
+  for (const issue of issues) {
+    if (issue.pull_request || issue.user?.type === 'Bot' || !parseCommand(issue.title)) continue;
+    out.push({
+      issue,
+      ok: false,
+      message:
+        "This wasn't counted: the Turkey Bowl now drafts live on the site, no GitHub needed. Refresh the site (or close the tab and open the link again), tap \"Which team is yours?\" once, then tap Draft there.",
+    });
+  }
+  return out;
+}
+
 async function main() {
   const nowMs = Date.now();
   const league = await readJSON('data/league.json');
@@ -112,7 +129,7 @@ async function main() {
   if (!league.repo && repo) league.repo = repo;
   const before = JSON.stringify(league);
 
-  const replies = process.env.LEAGUE_FROM_ISSUES === '1' ? await processIssues(league, players) : [];
+  const replies = process.env.LEAGUE_FROM_ISSUES === '1' ? await processIssues(league, players) : await redirectIssues();
   const leagueChanged = JSON.stringify(league) !== before;
   if (leagueChanged) await writeJSON('data/league.json', league);
   const scoresChanged = await updateScores(players, nowMs);

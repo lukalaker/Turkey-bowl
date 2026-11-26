@@ -2,8 +2,11 @@ name: Turkey Bowl bot
 
 # Publishes the website whenever code changes. Picks now happen live on the
 # site (Firebase); during the Thanksgiving games this also saves a backup copy
-# of the box scores every 5 minutes.
+# of the box scores every 5 minutes. A GitHub pick issue from an old browser tab
+# gets a reply telling them to refresh the site instead.
 on:
+  issues:
+    types: [opened]
   schedule:
     - cron: '*/5 17-23 26 11 *' # Thanksgiving, 12pm-7pm ET
     - cron: '*/5 0-5 27 11 *' # Thanksgiving night game
