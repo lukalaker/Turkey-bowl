@@ -15,7 +15,7 @@
     "K",
     "DEF"
   ],
-  "status": "signup",
+  "status": "drafting",
   "teams": [
     {
       "id": "t1",
@@ -36,11 +36,15 @@
       "color": "avocado"
     }
   ],
-  "order": [],
+  "order": [
+    "t1",
+    "t3",
+    "t2"
+  ],
   "turn": 0,
   "picks": [],
   "passes": [],
-  "startedAt": null,
+  "startedAt": "2026-11-26T02:48:28.000Z",
   "completedAt": null,
-  "updatedAt": "2026-11-26T02:47:30.000Z"
+  "updatedAt": "2026-11-26T02:48:28.000Z"
 }
