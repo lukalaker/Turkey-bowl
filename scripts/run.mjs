@@ -1,8 +1,8 @@
-// The Turkey Bowl league bot. Runs inside GitHub Actions.
-// 1. Reads open issues titled JOIN / ADD / KICK / PICK / UNDO / RESET (oldest first)
-//    and applies them to data/league.json using the shared draft rules.
-// 2. During game windows, pulls ESPN box scores into data/scores.json (backup for the website).
-// 3. Commits the changes, then replies to and closes each issue.
+// The Turkey Bowl bot. Runs inside GitHub Actions.
+// Picks now happen live on the website (Firebase), so issue commands are only
+// processed when LEAGUE_FROM_ISSUES=1 (the old GitHub-issue mode).
+// During game windows it pulls ESPN box scores into data/scores.json, a backup
+// the website uses if it can't reach ESPN itself.
 import { readFile, writeFile, appendFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { randomInt } from 'node:crypto';
@@ -112,7 +112,7 @@ async function main() {
   if (!league.repo && repo) league.repo = repo;
   const before = JSON.stringify(league);
 
-  const replies = await processIssues(league, players);
+  const replies = process.env.LEAGUE_FROM_ISSUES === '1' ? await processIssues(league, players) : [];
   const leagueChanged = JSON.stringify(league) !== before;
   if (leagueChanged) await writeJSON('data/league.json', league);
   const scoresChanged = await updateScores(players, nowMs);
