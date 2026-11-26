@@ -16,19 +16,12 @@
     "DEF"
   ],
   "status": "signup",
-  "teams": [
-    {
-      "id": "t1",
-      "name": "gravy train",
-      "owner": "lukalaker",
-      "color": "cranberry"
-    }
-  ],
+  "teams": [],
   "order": [],
   "turn": 0,
   "picks": [],
   "passes": [],
   "startedAt": null,
   "completedAt": null,
-  "updatedAt": "2026-11-26T02:35:23.000Z"
+  "updatedAt": null
 }
