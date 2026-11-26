@@ -244,7 +244,7 @@ function startDraft(league, players, nowMs, rng) {
 
 /** Turn an issue title into a command, e.g. "PICK: Josh Allen #3918298". */
 export function parseCommand(title) {
-  const m = /^\s*(join|add|kick|pick|undo|reset)\b\s*:?\s*(.*)$/i.exec(title ?? '');
+  const m = /^\s*(join|add|kick|start|pick|undo|reset)\b\s*:?\s*(.*)$/i.exec(title ?? '');
   if (!m) return null;
   return { kind: m[1].toLowerCase(), arg: m[2].trim() };
 }
@@ -329,11 +329,21 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
     if (seats > 0) {
       message += ` ${seats} seat${seats === 1 ? '' : 's'} left.`;
     } else {
-      startDraft(league, players, atMs, rng);
-      const order = league.order.map((id, i) => `${i + 1}. ${league.teams.find((t) => t.id === id).name}`).join('\n');
-      message += `\n\nThe league is full, so the draft is open. Snake order:\n${order}\n\n${clockMessage(league)}`;
+      message += `\n\nEvery seat is taken. @${league.commissioner}, tap Start the draft on the site when everyone's ready, and the draft order gets spun at random.`;
     }
     return done(message);
+  }
+
+  if (kind === 'start') {
+    if (!isCommish) return fail(`Only the commissioner (@${league.commissioner}) can start the draft.`);
+    if (league.status !== 'signup') return fail('The draft has already started. Use RESET to clear it first.');
+    if (league.teams.length < league.maxTeams) {
+      const seats = league.maxTeams - league.teams.length;
+      return fail(`Waiting on ${seats} more team${seats === 1 ? '' : 's'} before the draft can start.`);
+    }
+    startDraft(league, players, atMs, rng);
+    const order = league.order.map((id, i) => `${i + 1}. ${league.teams.find((t) => t.id === id).name}`).join('\n');
+    return done(`The draft order is spun! Snake order:\n${order}\n\nNo timer: as soon as one team picks, the next is up.\n\n${clockMessage(league)}`);
   }
 
   if (kind === 'kick') {
@@ -351,13 +361,12 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
       Object.assign(league, { status: 'signup', teams: [], order: [], turn: 0, picks: [], passes: [], startedAt: null, completedAt: null });
       return done('League wiped. All teams and picks are gone and every seat is open again.');
     }
-    if (league.teams.length >= league.maxTeams) {
-      startDraft(league, players, atMs, rng);
-      const order = league.order.map((id, i) => `${i + 1}. ${league.teams.find((t) => t.id === id).name}`).join('\n');
-      return done(`Draft reset with a fresh random order:\n${order}\n\n${clockMessage(league)}`);
-    }
     Object.assign(league, { status: 'signup', order: [], turn: 0, picks: [], passes: [], startedAt: null, completedAt: null });
-    return done('Draft reset. Waiting for the league to fill up.');
+    return done(
+      league.teams.length >= league.maxTeams
+        ? 'Draft reset. All picks are cleared and the teams are still seated. Tap Start the draft to spin a new order.'
+        : 'Draft reset. Waiting for the league to fill up.',
+    );
   }
 
   if (kind === 'undo') {
@@ -373,7 +382,7 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
   }
 
   if (kind === 'pick') {
-    if (league.status === 'signup') return fail('The draft starts once all 3 teams have joined.');
+    if (league.status === 'signup') return fail('The draft hasn\'t started yet. Once all 3 seats are taken, the commissioner taps Start the draft.');
     if (league.status === 'complete') return fail('The draft is already complete.');
     advance(league, players, atMs);
     if (league.status === 'complete') return fail('The draft is already complete.');

@@ -128,28 +128,97 @@ function setLeague(next) {
   const prev = S.league;
   S.league = next;
   S.leagueText = text;
+  if (S.me && !teamById(S.me)) S.me = '';
   if (prev) {
     const fresh = next.picks.slice(prev.picks.length);
     const last = fresh[fresh.length - 1];
+    const before = onClock(prev);
+    const now_ = onClock(next);
+    const myTurn = now_ && S.me === now_.id && before?.id !== now_.id;
     if (last) {
       const p = S.byId[last.player];
-      toast(`${teamById(last.team)?.name ?? 'A team'} drafted ${p?.name ?? 'a player'} for $${last.salary}`);
+      toast(`${teamById(last.team)?.name ?? 'A team'} drafted ${p?.name ?? 'a player'} for $${last.salary}.${myTurn ? " You're on the clock!" : ''}`);
       S.flash = last.player;
     } else if (next.teams.length > prev.teams.length) {
       toast(`${next.teams[next.teams.length - 1].name} joined the league`);
+    } else if (myTurn) {
+      toast("You're on the clock!");
     }
+    if (myTurn) navigator.vibrate?.([120, 80, 120]);
     if (S.pending) {
       const done =
         (S.pending.kind === 'pick' && next.picks.some((x) => x.player === S.pending.player)) ||
-        (S.pending.kind === 'join' && next.teams.length > prev.teams.length);
+        (S.pending.kind === 'join' && next.teams.length > prev.teams.length) ||
+        (S.pending.kind === 'start' && next.status !== 'signup');
       if (done) {
         S.pending = null;
         $('#sheet').open && $('#sheet').close();
       }
     }
   }
-  if (S.me && !teamById(S.me)) S.me = '';
+  // A freshly spun draft order plays once on every device that sees it early on.
+  const early = next.picks.length < next.order.length * 2;
+  if (next.status === 'drafting' && next.startedAt && early && store.get('tb.spun') !== next.startedAt) {
+    setTimeout(() => showSpin(), 250);
+  }
   return true;
+}
+
+/* ---------- the draft-order spin ---------- */
+function showSpin() {
+  const L = S.league;
+  if (!L?.order.length || $('.spin')) return;
+  store.set('tb.spun', L.startedAt ?? '');
+  const teams = L.order.map((id) => teamById(id));
+  const ords = ['1st pick', '2nd pick', '3rd pick', '4th pick'];
+  const el = document.createElement('div');
+  el.className = 'spin';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-labelledby', 'spin-title');
+  el.innerHTML = `<div class="spin-card">
+      <h2 id="spin-title">Spinning the draft order</h2>
+      <ol class="reels">${teams
+        .map((_, i) => `<li><span class="reel-label">${ords[i] ?? `Pick ${i + 1}`}</span><span class="reel"><span class="reel-name">&nbsp;</span></span></li>`)
+        .join('')}</ol>
+      <p class="spin-note" hidden>Snake draft: the order flips every round, and there's no timer. Pick when it's your turn.</p>
+      <button type="button" class="btn" hidden>Let's draft</button>
+    </div>`;
+  document.body.append(el);
+  const reels = [...el.querySelectorAll('.reel')];
+  const names = teams.map((t) => t.name);
+  let landed = 0;
+  reels.forEach((reel, i) => {
+    const label = reel.querySelector('.reel-name');
+    const stopAt = performance.now() + 1500 + i * 900;
+    let delay = 55;
+    let k = Math.floor(Math.random() * names.length);
+    const tick = () => {
+      if (performance.now() >= stopAt) {
+        const t = teams[i];
+        label.textContent = t.name;
+        reel.parentElement.dataset.color = t.color;
+        reel.classList.add('landed');
+        if (++landed === reels.length) {
+          el.querySelector('h2').textContent = 'The draft order is set';
+          el.querySelector('.spin-note').hidden = false;
+          const go = el.querySelector('button');
+          go.hidden = false;
+          go.focus();
+        }
+        return;
+      }
+      k = (k + 1) % names.length;
+      label.textContent = names[k];
+      reel.classList.remove('tick');
+      void reel.offsetWidth; // restart the tick animation
+      reel.classList.add('tick');
+      delay = Math.min(delay * 1.07, 260);
+      setTimeout(tick, delay);
+    };
+    tick();
+  });
+  el.querySelector('button').addEventListener('click', () => el.remove());
 }
 
 async function refreshLeague() {
@@ -258,7 +327,10 @@ function renderHero() {
   }
   if (ph === 'signup') {
     const n = L.teams.length;
-    el.innerHTML = `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>${n} of ${L.maxTeams}</strong> seats are taken. First kickoff ${first ? fmtTime(first.kickoff) : ''}.</p>`;
+    el.innerHTML =
+      n >= L.maxTeams
+        ? `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>Every seat is taken.</strong> Waiting for @${esc(L.commissioner)} to spin the draft order.</p>`
+        : `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>${n} of ${L.maxTeams}</strong> seats are taken. First kickoff ${first ? fmtTime(first.kickoff) : ''}.</p>`;
     return;
   }
   if (ph === 'drafting') {
@@ -358,9 +430,19 @@ function topHTML() {
           : `<li class="empty"><b>Open seat</b><span>Waiting for a family member</span></li>`,
       );
     }
+    if (L.teams.length >= L.maxTeams) {
+      return `<section class="section join panel">
+        <div><h2>Everyone's at the table</h2>
+        <p class="lede">All ${L.maxTeams} seats are taken. When the family is ready, the commissioner starts the draft and the order spins at random on everyone's screen.</p></div>
+        <div><button class="btn" type="button" id="start-draft">Start the draft</button></div>
+        <p class="hint">Only the commissioner, @${esc(L.commissioner)}, can start it. GitHub opens with START filled in; tap Submit and the spin begins within a minute.</p>
+        <ul class="seats">${seats.join('')}</ul>
+      </section>
+      <section class="section"><h2>Players and prices</h2><p class="lede">Prices are set. Plan your plate while you wait.</p></section>`;
+    }
     return `<section class="section join panel">
         <div><h2>Take a seat at the table</h2>
-        <p class="lede">Name your team and claim a seat. When all ${L.maxTeams} seats are taken, the draft order is drawn at random and the draft opens.</p></div>
+        <p class="lede">Name your team and claim a seat. When all ${L.maxTeams} seats are taken, the commissioner starts the draft and the order spins at random.</p></div>
         <form id="join-form">
           <label class="sr-only" for="team-name">Team name</label>
           <input id="team-name" name="team" maxlength="32" required placeholder="Team name, like Gravy Train" autocomplete="off">
@@ -445,7 +527,8 @@ function renderBoard() {
     body += `<tr><th scope="row">Rd ${r + 1}</th>${cells.join('')}</tr>`;
   }
   $('#view').innerHTML = `<h2>Draft board</h2>
-    <p class="lede">Snake order: the team that picks last in one round picks first in the next.</p>
+    <p class="lede">Snake order: the team that picks last in one round picks first in the next. No timer: as soon as one team picks, the next is up.</p>
+    <p><button type="button" class="btn quiet small" data-replay>Replay the draft-order spin</button></p>
     <div class="board-wrap"><table class="board"><thead><tr><th></th>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
@@ -517,7 +600,7 @@ function renderRules() {
     <section><h2>How to play</h2>
       <ol class="steps">
         <li><b>Join.</b> Name your team on the Players tab and submit it on GitHub. You need a free GitHub account. Family without one can ask the commissioner, @${esc(L.commissioner)}, to add them.</li>
-        <li><b>Draft.</b> Once ${L.maxTeams} teams are in, the order is drawn at random and the snake draft starts (1-2-3, then 3-2-1). On your turn, tap Draft, then Submit on GitHub. The league bot checks the pick and replies within a minute.</li>
+        <li><b>Draft.</b> Once ${L.maxTeams} teams are in, the commissioner taps Start the draft and the order spins at random. It's a snake draft (1-2-3, then 3-2-1) with no timer: as soon as one team picks, the next is up. On your turn, tap Draft, then Submit on GitHub. The league bot checks the pick and replies within a minute.</li>
         <li><b>Watch.</b> Your players score during Thursday's three games. Highest total after the night game wins it all.</li>
       </ol></section>
     <div class="cols">
@@ -655,6 +738,16 @@ function bind() {
   });
   const view = $('#view');
   view.addEventListener('click', (e) => {
+    if (e.target.closest('[data-replay]')) return showSpin();
+    if (e.target.closest('#start-draft')) {
+      window.open(
+        issueUrl('START', 'Tap **Submit new issue** (or **Create**) to start the Turkey Bowl draft. The league bot spins a random draft order and replies here within a minute.'),
+        '_blank',
+        'noopener',
+      );
+      S.pending = { kind: 'start' };
+      return waitingSheet('The draft order spins on everyone\'s screen as soon as the league bot sees your GitHub issue. This page updates by itself.');
+    }
     const team = e.target.closest('[data-team]');
     if (team) {
       const id = team.dataset.team;

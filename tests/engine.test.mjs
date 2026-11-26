@@ -23,8 +23,9 @@ function league3() {
   const run = (kind, arg, author) => applyCommand(L, players, { kind, arg, author, atMs: BEFORE }, rngFixed);
   run('join', 'Gravy Train', 'commish');
   run('join', 'Stuffing Stars', 'aunt');
-  const r = run('join', 'Pie Hards', 'cousin');
-  return { L, run, r };
+  const joined = run('join', 'Pie Hards', 'cousin');
+  const r = run('start', '', 'commish');
+  return { L, run, r, joined };
 }
 
 const byName = (name) => players.find((p) => p.name === name);
@@ -47,12 +48,39 @@ test('snake order goes 1-2-3-3-2-1', () => {
   assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map((t) => snakeIndex(t, 3)), [0, 1, 2, 2, 1, 0, 0]);
 });
 
-test('three joins fill the league and open the draft', () => {
-  const { L, r } = league3();
+test('a full league waits for the commissioner to start and spin the order', () => {
+  const L = newLeague({ commissioner: 'commish', repo: 'o/r' });
+  const run = (kind, arg, author) => applyCommand(L, players, { kind, arg, author, atMs: BEFORE }, rngFixed);
+  run('join', 'Gravy Train', 'commish');
+  assert.equal(run('start', '', 'commish').ok, false, 'cannot start with open seats');
+  run('join', 'Stuffing Stars', 'aunt');
+  const full = run('join', 'Pie Hards', 'cousin');
+  assert.match(full.message, /Start the draft/);
+  assert.equal(L.status, 'signup');
+  assert.equal(L.order.length, 0);
+  assert.equal(run('start', '', 'aunt').ok, false, 'only the commissioner starts');
+  const r = run('start', '', 'commish');
+  assert.ok(r.ok, r.message);
+  assert.match(r.message, /spun/);
   assert.equal(L.status, 'drafting');
-  assert.equal(L.teams.length, 3);
-  assert.match(r.message, /draft is open/);
+  assert.equal(L.order.length, 3);
+  assert.ok(L.startedAt);
   assert.ok(onClock(L));
+  assert.equal(run('start', '', 'commish').ok, false, 'cannot start twice');
+});
+
+test('the spun order is random', () => {
+  const orders = new Set();
+  for (let i = 0; i < 40; i++) {
+    const L = newLeague({ commissioner: 'commish', repo: 'o/r' });
+    const run = (kind, arg, author) => applyCommand(L, players, { kind, arg, author, atMs: BEFORE });
+    run('join', 'A', 'commish');
+    run('join', 'B', 'aunt');
+    run('join', 'C', 'cousin');
+    run('start', '', 'commish');
+    orders.add(L.order.join());
+  }
+  assert.ok(orders.size >= 4, `only ${orders.size} distinct orders in 40 spins`);
 });
 
 test('a fourth join is turned away', () => {
@@ -199,12 +227,15 @@ test('cheapestFill handles flex and impossible cases', () => {
   assert.equal(cheapestFill(['QB'], pool), Infinity);
 });
 
-test('reset reshuffles and clears picks', () => {
+test('reset clears picks, keeps the teams, and waits for a new spin', () => {
   const { L, run } = league3();
   run('pick', 'Josh Allen', onClock(L).owner);
   const r = run('reset', '', 'commish');
   assert.ok(r.ok);
   assert.equal(L.picks.length, 0);
+  assert.equal(L.teams.length, 3);
+  assert.equal(L.status, 'signup');
+  assert.ok(run('start', '', 'commish').ok);
   assert.equal(L.status, 'drafting');
 });
 
@@ -217,6 +248,7 @@ test('commissioner can add a team for someone without GitHub and picks for them'
   assert.equal(L.teams[1].owner, 'bobgh');
   assert.equal(L.teams[0].owner, null);
   run('join', 'Gravy Train', 'commish');
+  run('start', '', 'commish');
   assert.equal(L.status, 'drafting');
   const grandma = L.teams[0];
   const cheapFirst = [...players].sort((a, b) => a.salary - b.salary).filter((p) => p.name !== 'Jahmyr Gibbs');

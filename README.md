@@ -7,7 +7,7 @@ A one-day fantasy football league for the three Thanksgiving games: Bears at Lio
 ## How to play
 
 1. **Join.** Open the site, type a team name and tap **Join on GitHub**. GitHub opens with your team filled in; tap **Submit new issue**. You need a free [GitHub account](https://github.com/signup). Family without one can ask the commissioner to add them.
-2. **Draft.** When all three seats are taken, the draft order is drawn at random and a snake draft starts (1-2-3, then 3-2-1). On your turn, tap **Draft** next to a player, then **Submit** on GitHub. The league bot checks the pick, replies on your issue and updates the site, usually within a minute. GitHub also emails you when you're on the clock.
+2. **Draft.** When all three seats are taken, the commissioner taps **Start the draft**. The bot draws a random order and it spins onto everyone's screen. It's a snake draft (1-2-3, then 3-2-1) with no timer: as soon as one team picks, the next is up. On your turn, tap **Draft** next to a player, then **Submit** on GitHub. The league bot checks the pick, replies on your issue and updates the site, usually within a minute. GitHub also emails you when you're on the clock, and the site buzzes your phone if you've picked your team under "I'm drafting as".
 3. **Watch.** Points update live on the site during the games. The highest total after the night game wins.
 
 ### Roster and budget
@@ -41,9 +41,10 @@ The repo owner is the commissioner. Run the league by opening an issue with one 
 | `ADD: Grandma's Gravy Boat` | Adds a team the commissioner drafts for (for family without GitHub) |
 | `ADD: Team name @username` | Saves a seat for a specific GitHub user |
 | `KICK: Team name` | Removes a team before the draft starts |
+| `START` | Spins a random draft order and opens the draft (the site's **Start the draft** button files this) |
 | `PICK: Player name` | Picks for whichever team is on the clock |
 | `UNDO` | Takes back the last pick |
-| `RESET` | Clears all picks and draws a new draft order |
+| `RESET` | Clears all picks, keeps the teams, and waits for a new `START` spin |
 | `RESET ALL` | Removes every team and pick (use after testing) |
 
 Anyone can open a `JOIN:` issue while seats are open. If a stranger grabs a seat, `KICK` them.

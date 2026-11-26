@@ -86,6 +86,7 @@ body {
     repeating-linear-gradient(90deg, transparent 0 10px, var(--plaid-a) 10px 26px, transparent 26px 72px);
 }
 img { display: block; }
+[hidden] { display: none !important; }
 button, input, select { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .sr-only {
@@ -430,6 +431,43 @@ code { font: 600 0.9em var(--tight); background: var(--fold); border-radius: 4px
   background: var(--roast); color: var(--cream); font-weight: 600; box-shadow: 0 10px 26px rgba(42, 20, 11, 0.35);
 }
 .noscript { padding: 16px; }
+
+/* The draft-order spin: a slot machine of team names */
+.spin {
+  position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(240, 169, 44, 0.22), transparent 70%),
+    rgba(42, 20, 11, 0.94);
+}
+.spin-card {
+  position: relative; width: min(30rem, 100%); padding: 34px 20px 22px; border-radius: 18px;
+  background: var(--roast); color: var(--cream); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  display: grid; gap: 16px; text-align: center; overflow: hidden;
+}
+.spin-card::before {
+  content: ''; position: absolute; inset: 0 0 auto; height: 12px;
+  background: linear-gradient(180deg, var(--gold) 0 3px, var(--pumpkin) 3px 6px, var(--cranberry) 6px 9px, var(--avocado) 9px 12px);
+}
+.spin-card h2 { margin: 0; font: 400 clamp(1.5rem, 6.5vw, 2rem) / 1.15 var(--display); color: var(--cream); }
+.reels { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.reels li { display: grid; grid-template-columns: 5.2rem minmax(0, 1fr); align-items: center; gap: 10px; }
+.reel-label { font: 700 1rem var(--tight); color: var(--gold); text-align: right; }
+.reel {
+  display: block; overflow: hidden; padding: 12px 14px; border-radius: 12px;
+  background: var(--roast-deep); border: 2px solid rgba(255, 244, 228, 0.18);
+  font: 700 clamp(1.25rem, 5.5vw, 1.6rem) / 1.15 var(--tight); text-align: left;
+  white-space: nowrap; text-overflow: ellipsis;
+}
+.reel-name { display: block; overflow: hidden; text-overflow: ellipsis; }
+.reel.tick .reel-name { animation: reel-tick 0.09s linear; }
+@keyframes reel-tick { from { transform: translateY(-60%); opacity: 0.3; } }
+.reel.landed {
+  background: var(--team); border-color: var(--cream); color: #fff;
+  animation: reel-land 0.45s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes reel-land { from { transform: scale(1.12); } }
+.spin-note { margin: 0; color: var(--cream-dim); }
+.spin-card .btn { justify-self: center; min-width: 10rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .wordmark, .player.flash { animation: none; }
