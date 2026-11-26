@@ -36,10 +36,13 @@ const S = {
   hideTaken: store.get('tb.hideTaken') !== '0',
   pending: null,
   flash: null,
+  open: new Set(), // leaderboard teams that are expanded
 };
 
 const POSITIONS = ['ALL', 'QB', 'RB', 'WR', 'TE', 'FLEX', 'K', 'DEF'];
-const DRUMSTICK = `<svg class="drumstick" viewBox="0 0 32 32" aria-hidden="true"><path d="M14 18 6.8 25.2" stroke="#fff4e4" stroke-width="3.6" stroke-linecap="round"/><circle cx="4.6" cy="24.8" r="2.6" fill="#fff4e4"/><circle cx="7.2" cy="27.4" r="2.6" fill="#fff4e4"/><ellipse cx="20.2" cy="11.8" rx="10.2" ry="8.2" transform="rotate(-45 20.2 11.8)" fill="#c8741f"/><ellipse cx="22.6" cy="8.8" rx="4.4" ry="2.3" transform="rotate(-45 22.6 8.8)" fill="#eaa456"/></svg>`;
+// A little turkey with a harvest-striped tail, shown beside each player's account name.
+const TURKEY = `<svg class="turkey" viewBox="0 0 24 24" aria-hidden="true"><g transform="translate(12 14)"><ellipse rx="2.9" ry="7.6" transform="rotate(-62) translate(0 -5.2)" fill="#5c6a1e"/><ellipse rx="2.9" ry="7.6" transform="rotate(-31) translate(0 -5.2)" fill="#9e1f36"/><ellipse rx="2.9" ry="7.6" transform="translate(0 -5.2)" fill="#e2661e"/><ellipse rx="2.9" ry="7.6" transform="rotate(31) translate(0 -5.2)" fill="#f0a92c"/><ellipse rx="2.9" ry="7.6" transform="rotate(62) translate(0 -5.2)" fill="#9e1f36"/></g><ellipse cx="12" cy="16.4" rx="5.3" ry="5.4" fill="#6e3618"/><circle cx="12" cy="10.8" r="2.8" fill="#8f4a22"/><circle cx="12.9" cy="10.2" r="0.65" fill="#fff4e4"/><path d="M14.5 10.9l1.9.6-1.9.6z" fill="#f0a92c"/><path d="M13.5 11.8c.7.9.6 1.9-.1 2.4-.4-.8-.4-1.6.1-2.4z" fill="#c8243f"/></svg>`;
+const DRUMSTICK = `<svg class="drumstick" viewBox="0 0 32 32" aria-hidden="true"><path d="M14 18 6.8 25.2" stroke="#b98d63" stroke-width="5.4" stroke-linecap="round"/><circle cx="4.6" cy="24.8" r="3.3" fill="#b98d63"/><circle cx="7.2" cy="27.4" r="3.3" fill="#b98d63"/><path d="M14 18 6.8 25.2" stroke="#fff4e4" stroke-width="3.6" stroke-linecap="round"/><circle cx="4.6" cy="24.8" r="2.5" fill="#fff4e4"/><circle cx="7.2" cy="27.4" r="2.5" fill="#fff4e4"/><ellipse cx="20.2" cy="11.8" rx="10.2" ry="8.2" transform="rotate(-45 20.2 11.8)" fill="#c8741f"/><ellipse cx="22.6" cy="8.8" rx="4.4" ry="2.3" transform="rotate(-45 22.6 8.8)" fill="#eaa456"/></svg>`;
 const FILTER_LABEL = { ALL: 'All', FLEX: 'Flex', DEF: 'D/ST' };
 
 /* ---------- helpers ---------- */
@@ -59,6 +62,11 @@ function issueUrl(title, body) {
 }
 function teamById(id) {
   return S.league?.teams.find((t) => t.id === id) ?? null;
+}
+function ownerLabel(t) {
+  return t.owner
+    ? `<span class="owner">${TURKEY}@${esc(t.owner)}</span>`
+    : `<span class="owner">Commissioner drafts</span>`;
 }
 function gameState(g) {
   const b = S.board[g.id];
@@ -221,9 +229,10 @@ function scoreboardHTML(st, mode) {
               : 'Everyone has played';
       const leads = val(x) === top && top > 0;
       return `<li class="${leads ? 'leader' : ''}" data-color="${esc(x.t.color)}">
+        <button type="button" class="sb-row" data-goto-team="${esc(x.t.id)}">
         <span class="sb-rank">${leads ? `${DRUMSTICK}<span class="sr-only">Leader</span>` : i + 1}</span>
         <span class="sb-name">${esc(x.t.name)}<small>${sub}</small></span>
-        <span class="sb-pts">${pts(val(x))}</span></li>`;
+        <span class="sb-pts">${pts(val(x))}</span></button></li>`;
     })
     .join('')}</ol>`;
 }
@@ -345,7 +354,7 @@ function topHTML() {
       const t = L.teams[i];
       seats.push(
         t
-          ? `<li data-color="${esc(t.color)}"><b>${esc(t.name)}</b><span>${t.owner ? `@${esc(t.owner)}` : 'Commissioner drafts'}</span></li>`
+          ? `<li data-color="${esc(t.color)}"><b>${esc(t.name)}</b>${ownerLabel(t)}</li>`
           : `<li class="empty"><b>Open seat</b><span>Waiting for a family member</span></li>`,
       );
     }
@@ -363,7 +372,7 @@ function topHTML() {
       <section class="section"><h2>Players and prices</h2><p class="lede">Prices are set. Plan your plate while the seats fill up.</p></section>`;
   }
   if (L.status === 'complete') {
-    return `<section class="section"><h2>Draft complete</h2><p class="lede">Every team is set. Watch the scores on the Teams tab once the games start.</p></section>`;
+    return `<section class="section"><h2>Draft complete</h2><p class="lede">Every team is set. Follow the race on the Leaderboard tab once the games start.</p></section>`;
   }
   const clock = onClock(L);
   const team = st.teams[clock.id];
@@ -440,19 +449,9 @@ function renderBoard() {
     <div class="board-wrap"><table class="board"><thead><tr><th></th>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
-/* ---------- teams view ---------- */
-function renderTeams() {
-  const L = S.league;
-  if (!L.teams.length) {
-    $('#view').innerHTML = `<h2>Teams</h2><p class="lede">No teams yet. Join from the Players tab.</p>`;
-    return;
-  }
-  const st = buildState(L, S.players);
-  const started = phase() === 'live' || phase() === 'final';
-  const cards = L.teams.map((t0) => {
-    const t = st.teams[t0.id];
-    const s = teamScore(t);
-    const rows = t.roster
+/* ---------- leaderboard ---------- */
+function rosterRows(t, started) {
+  return t.roster
       .map((r) => {
         if (!r.player) return `<li class="open"><span class="slot">${POS_LABEL[r.slot]}</span><div class="who"><b>Open</b></div><span></span></li>`;
         const p = r.player;
@@ -467,14 +466,47 @@ function renderTeams() {
         return `<li><span class="slot">${POS_LABEL[r.slot]}</span><div class="who"><b>${esc(p.name)}</b><span>${line}</span></div>${right}</li>`;
       })
       .join('');
-    const total = started
-      ? `<div class="team-total">${pts(s.total)}<small><br>points</small></div>`
-      : `<div class="team-total">$${t.left}<small><br>left</small></div>`;
-    return `<article class="team" data-color="${esc(t.color)}" style="border-top-color:var(--team)">
-      <div class="team-head"><div><h3>${esc(t.name)}</h3><small>${t.owner ? `@${esc(t.owner)}` : 'Commissioner drafts'}</small></div>${total}</div>
-      <ul class="roster">${rows}</ul></article>`;
+}
+
+function renderLeaderboard() {
+  const L = S.league;
+  if (!L.teams.length) {
+    $('#view').innerHTML = `<h2>Leaderboard</h2><p class="lede">No teams yet. Take a seat at the table from the Players tab.</p>`;
+    return;
+  }
+  const st = buildState(L, S.players);
+  const ph = phase();
+  const started = ph === 'live' || ph === 'final';
+  const ranked = Object.values(st.teams)
+    .map((t) => ({ t, s: teamScore(t) }))
+    .sort((a, b) => b.s.total - a.s.total || b.s.proj - a.s.proj);
+  const top = ranked[0]?.s.total ?? 0;
+  const items = ranked.map(({ t, s }, i) => {
+    const open = S.open.has(t.id);
+    const leads = started && top > 0 && s.total === top;
+    const playing = t.roster.filter((r) => r.player && gameState(gameOf(r.player)) === 'in').length;
+    let sub;
+    if (!started) {
+      sub = L.status === 'drafting' ? `${t.picks.length} of ${slotsFor(L).length} drafted, $${t.left} left` : `${pts(s.proj)} projected`;
+    } else if (ph === 'final') {
+      sub = 'Final';
+    } else {
+      sub = [playing ? `${playing} playing` : '', s.toPlay ? `${s.toPlay} to play` : ''].filter(Boolean).join(', ') || 'Everyone has played';
+    }
+    return `<li class="lb-team${open ? ' open' : ''}${leads ? ' leader' : ''}" id="team-${esc(t.id)}" data-color="${esc(t.color)}">
+      <button type="button" class="lb-row" data-team="${esc(t.id)}" aria-expanded="${open}">
+        <span class="lb-rank">${leads ? `${DRUMSTICK}<span class="sr-only">Leader</span>` : i + 1}</span>
+        <span class="lb-name"><b>${esc(t.name)}</b>${ownerLabel(t)}</span>
+        <span class="lb-total">${pts(s.total)}<small>${sub}</small></span>
+        <span class="lb-chevron" aria-hidden="true"></span>
+      </button>
+      ${open ? `<ul class="roster">${rosterRows(t, started)}</ul>` : ''}
+    </li>`;
   });
-  $('#view').innerHTML = `<h2>Teams</h2><p class="lede">${started ? 'Points update every 30 seconds while games are on. Tap a score to see how it was earned.' : 'Rosters fill in as the draft goes.'}</p><div class="team-grid">${cards.join('')}</div>`;
+  const lede = started
+    ? 'Live points, updated every 30 seconds. Tap a team to see its players, then tap a score to see how it was earned.'
+    : 'Points start counting at kickoff. Tap a team to see its players.';
+  $('#view').innerHTML = `<h2>Leaderboard</h2><p class="lede">${lede}</p><ol class="leaderboard">${items.join('')}</ol>`;
 }
 
 /* ---------- rules view ---------- */
@@ -583,7 +615,14 @@ function waitingSheet(text) {
 /* ---------- render + events ---------- */
 function defaultTab() {
   const ph = phase();
-  return ph === 'live' || ph === 'final' ? 'teams' : 'players';
+  return ph === 'live' || ph === 'final' || ph === 'complete' ? 'leaderboard' : 'players';
+}
+
+function showTeam(teamId) {
+  S.tab = 'leaderboard';
+  S.open.add(teamId);
+  render(true);
+  document.getElementById(`team-${teamId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function render(full = false) {
@@ -597,7 +636,7 @@ function render(full = false) {
   }
   if (tab === 'players') renderPlayers(full);
   else if (tab === 'board') renderBoard();
-  else if (tab === 'teams') renderTeams();
+  else if (tab === 'leaderboard') renderLeaderboard();
   else renderRules();
   S.flash = null;
 }
@@ -609,8 +648,19 @@ function bind() {
     S.tab = b.dataset.tab;
     render(true);
   });
+  $('#hero-body').addEventListener('click', (e) => {
+    const row = e.target.closest('[data-goto-team]');
+    if (row) showTeam(row.dataset.gotoTeam);
+  });
   const view = $('#view');
   view.addEventListener('click', (e) => {
+    const team = e.target.closest('[data-team]');
+    if (team) {
+      const id = team.dataset.team;
+      if (S.open.has(id)) S.open.delete(id);
+      else S.open.add(id);
+      return renderLeaderboard();
+    }
     const draft = e.target.closest('[data-draft]');
     if (draft) return openPickSheet(draft.dataset.draft);
     const points = e.target.closest('[data-points]');
