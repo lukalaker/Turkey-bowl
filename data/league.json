@@ -28,6 +28,12 @@
       "name": "Austin",
       "owner": "austinpaxton",
       "color": "pumpkin"
+    },
+    {
+      "id": "t3",
+      "name": "Big Daddy",
+      "owner": "razorback1000",
+      "color": "avocado"
     }
   ],
   "order": [],
@@ -36,5 +42,5 @@
   "passes": [],
   "startedAt": null,
   "completedAt": null,
-  "updatedAt": "2026-11-26T02:46:35.000Z"
+  "updatedAt": "2026-11-26T02:47:30.000Z"
 }
