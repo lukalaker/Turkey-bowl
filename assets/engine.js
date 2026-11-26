@@ -117,8 +117,40 @@ export function onClock(league) {
   return league.teams.find((t) => t.id === id) ?? null;
 }
 
-/** Can this team legally take this player right now? Returns {ok, slot} or {ok:false, error}. */
+/**
+ * Can this team legally take this player right now?
+ * Returns {ok, slot, price, leftAfter} or {ok:false, error, reason}.
+ * Bargain bin: when a team can't afford anyone for its open spots (others took the
+ * cheap players it was saving for), it may take the cheapest player left at an open
+ * spot for whatever money it has, so no roster ends up short.
+ */
 export function checkPick(league, players, teamId, playerId, nowMs, state = buildState(league, players)) {
+  const r = checkPickStrict(league, players, teamId, playerId, nowMs, state);
+  if (r.ok || (r.reason !== 'budget' && r.reason !== 'reserve')) return r;
+  if (!isStuck(league, players, teamId, nowMs, state)) return r;
+  const team = state.teams[teamId];
+  const player = state.byId[playerId];
+  const slot = slotFor(team.open, player.pos);
+  const pool = players.filter((p) => !state.ownerOf[p.id] && !isLocked(p, nowMs) && slotFor(team.open, p.pos) === slot);
+  const cheapest = Math.min(...pool.map((p) => p.salary));
+  if (player.salary !== cheapest) {
+    return { ok: false, error: `${team.name} is in the bargain bin and can only take the cheapest ${POS_LABEL[slot]} left ($${cheapest}).`, reason: 'budget' };
+  }
+  const price = Math.max(0, Math.min(player.salary, team.left));
+  return { ok: true, slot, player, team, price, bargain: true, leftAfter: team.left - price };
+}
+
+/** True when the team has open spots but no normally affordable player left. */
+function isStuck(league, players, teamId, nowMs, state) {
+  state._stuck ??= {};
+  if (!(teamId in state._stuck)) {
+    const team = state.teams[teamId];
+    state._stuck[teamId] = !team.full && !players.some((p) => checkPickStrict(league, players, teamId, p.id, nowMs, state).ok);
+  }
+  return state._stuck[teamId];
+}
+
+function checkPickStrict(league, players, teamId, playerId, nowMs, state) {
   const team = state.teams[teamId];
   const player = state.byId[playerId];
   if (!team) return { ok: false, error: 'That team is not in the league.' };
@@ -151,7 +183,7 @@ export function checkPick(league, players, teamId, playerId, nowMs, state = buil
       reason: 'reserve',
     };
   }
-  return { ok: true, slot, player, team, leftAfter };
+  return { ok: true, slot, player, team, price: player.salary, leftAfter };
 }
 
 /** Most a team can spend on its next pick and still fill every other spot. */
@@ -159,7 +191,7 @@ export function maxBid(league, players, teamId, nowMs, state = buildState(league
   let best = -1;
   for (const p of players) {
     const r = checkPick(league, players, teamId, p.id, nowMs, state);
-    if (r.ok && p.salary > best) best = p.salary;
+    if (r.ok && r.price > best) best = r.price;
   }
   return best;
 }
@@ -360,14 +392,16 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
       team: team.id,
       player: player.id,
       slot: r.slot,
-      salary: player.salary,
+      salary: r.price,
+      ...(r.bargain ? { bargain: true } : {}),
       by: author,
       at: new Date(atMs).toISOString(),
     });
     league.turn += 1;
     advance(league, players, atMs);
     const forText = sameUser(team.owner, author) ? '' : ` (entered by the commissioner)`;
-    const msg = `${team.name} drafts ${player.name} (${player.team} ${POS_LABEL[player.pos]}) for $${player.salary} at ${POS_LABEL[r.slot]}${forText}. $${r.leftAfter} left.`;
+    const bargainText = r.bargain ? ` from the bargain bin (the cheapest ${POS_LABEL[r.slot]} left, for the money ${team.name} had)` : '';
+    const msg = `${team.name} drafts ${player.name} (${player.team} ${POS_LABEL[player.pos]}) for $${r.price}${bargainText} at ${POS_LABEL[r.slot]}${forText}. $${r.leftAfter} left.`;
     return done(`${msg}\n\n${clockMessage(league)}`);
   }
 

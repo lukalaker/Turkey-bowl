@@ -15,7 +15,9 @@ A one-day fantasy football league for the three Thanksgiving games: Bears at Lio
 - **$100** for 9 spots: QB, RB, RB, WR, WR, TE, Flex (RB/WR/TE), K, D/ST.
 - Once a player is drafted, nobody else can have him.
 - You must always keep enough money to fill your remaining spots with the cheapest players still available. The site shows the most you can spend on each pick.
-- Players lock when their game kicks off. A team that can't afford anyone for its open spots has its turn skipped.
+- Players lock when their game kicks off.
+- Bargain bin: if other teams take the cheap players you were saving for and you can't afford anyone, you can take the cheapest player left at an open spot for whatever money you have, so no roster ends up short.
+- Prices come from this week's projections: about $0.55 per projected point plus a premium for stars (squared term), $2 minimum; kickers and D/ST are $0.50 per point.
 
 ### Scoring (full PPR)
 

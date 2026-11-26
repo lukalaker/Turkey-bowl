@@ -240,3 +240,37 @@ test('RESET ALL wipes test teams and picks back to an empty league', () => {
   assert.equal(L.picks.length, 0);
   assert.ok(run('join', 'Gravy Train', 'commish').ok);
 });
+
+test('bargain bin: a team priced out of its last spot still gets the cheapest player left', () => {
+  const { L, run } = league3();
+  const t = onClock(L);
+  // Eight spots filled, $2 left, only D/ST open.
+  const fill = [
+    ['Josh Allen', 'QB'], ['Javonte Williams', 'RB'], ['James Cook III', 'RB'], ['Luther Burden III', 'WR'],
+    ['Jameson Williams', 'WR'], ['Dallas Goedert', 'TE'], ['Rashee Rice', 'FLEX'], ['Brandon Aubrey', 'K'],
+  ];
+  fill.forEach(([n, slot], i) => L.picks.push({ n: i + 1, turn: i, team: t.id, player: byName(n).id, slot, salary: byName(n).salary }));
+  const spent = fill.reduce((s, [n]) => s + byName(n).salary, 0);
+  L.picks[0].salary += 100 - 2 - spent; // leave exactly $2
+  // Another team already took both $2 defenses.
+  const other = L.teams.find((x) => x.id !== t.id);
+  for (const d of players.filter((p) => p.pos === 'DEF' && p.salary === 2)) {
+    L.picks.push({ n: L.picks.length + 1, turn: 50 + L.picks.length, team: other.id, player: d.id, slot: 'DEF', salary: 2 });
+  }
+  const st = buildState(L, players);
+  assert.equal(st.teams[t.id].left, 2);
+  const cheapest = players.filter((p) => p.pos === 'DEF' && !st.ownerOf[p.id]).sort((a, b) => a.salary - b.salary)[0];
+  assert.ok(cheapest.salary > 2);
+  const r = checkPick(L, players, t.id, cheapest.id, BEFORE);
+  assert.ok(r.ok, r.error);
+  assert.equal(r.bargain, true);
+  assert.equal(r.price, 2);
+  assert.equal(r.leftAfter, 0);
+  // Only the cheapest one, not a pricier defense.
+  const pricier = players.filter((p) => p.pos === 'DEF' && !st.ownerOf[p.id] && p.salary > cheapest.salary)[0];
+  if (pricier) assert.equal(checkPick(L, players, t.id, pricier.id, BEFORE).ok, false);
+  // A team that can still afford normal picks gets no bargains.
+  const rich = L.teams.find((x) => x.id !== t.id && x.id !== other.id);
+  const exp = players.find((p) => p.name === 'Jahmyr Gibbs');
+  assert.equal(checkPick(L, players, rich.id, exp.id, BEFORE).bargain, undefined);
+});

@@ -89,6 +89,8 @@ async function main() {
     } else if (pts < MIN_PROJ) continue;
     if (['Out', 'IR', 'PUP', 'Sus'].includes(p.injury_status)) continue;
 
+    // Price from the same rounded projection the site shows, so the two always agree.
+    const shown = Math.round(pts * 10) / 10;
     const base = {
       pos: position,
       team: r.team,
@@ -96,8 +98,8 @@ async function main() {
       home: tg.home,
       game: tg.game.id,
       kickoff: tg.game.kickoff,
-      proj: Math.round(pts * 10) / 10,
-      salary: salaryFor(position, pts),
+      proj: shown,
+      salary: salaryFor(position, shown),
       injury: p.injury_status ?? null,
     };
     if (position === 'DEF') {

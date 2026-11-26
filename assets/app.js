@@ -525,7 +525,8 @@ function renderRules() {
         <p>Every team gets <b>$${L.cap}</b> for ${slotsFor(L).length} spots: QB, RB, RB, WR, WR, TE, Flex (RB, WR or TE), K and D/ST.</p>
         <p>Every player belongs to one team only. Once he's drafted, he's gone.</p>
         <p>You always have to keep enough money to fill your other spots with the cheapest players left. The status box shows the most you can spend on each pick.</p>
-        <p>Players lock when their game kicks off. If a team can't afford anyone for its open spots, its turn is skipped.</p>
+        <p>Players lock when their game kicks off.</p>
+        <p>Bargain bin: if the other teams take the cheap players you were saving for and you can't afford anyone, you can take the cheapest player left at an open spot for whatever money you have. Nobody ends up a player short.</p>
         <p>A tie at the end is a tie. Split the pie.</p></section>
       <section><h3>Scoring (full PPR)</h3>
         <table class="score-table"><tbody>
@@ -571,7 +572,7 @@ function openPickSheet(playerId) {
     `Tap **Submit new issue** (or **Create**) to lock in this pick for ${clock.name}.\n\nThe league bot replies here within a minute.`,
   );
   $('#sheet-body').innerHTML = `<h2 id="sheet-title">Draft ${esc(p.name)}?</h2>
-    <p>${esc(p.team)} ${POS_LABEL[p.pos]} at ${POS_LABEL[r.slot]} for $${p.salary}. ${esc(clock.name)} would have $${r.leftAfter} left for ${open} spot${open === 1 ? '' : 's'}.</p>
+    <p>${esc(p.team)} ${POS_LABEL[p.pos]} at ${POS_LABEL[r.slot]} for $${r.price}${r.bargain ? ` from the bargain bin (he lists at $${p.salary})` : ''}. ${esc(clock.name)} would have $${r.leftAfter} left for ${open} spot${open === 1 ? '' : 's'}.</p>
     <p class="hint">GitHub opens with the pick filled in. Tap Submit there and the league bot locks it in.</p>
     <div class="actions"><button class="btn quiet" value="cancel">Cancel</button>
     <a class="btn" id="go" href="${esc(url)}" target="_blank" rel="noopener">Open GitHub to submit</a></div>`;
