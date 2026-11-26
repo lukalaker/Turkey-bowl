@@ -1,9 +1,11 @@
 name: Turkey Bowl bot
 
-# Publishes the website whenever code changes. Picks now happen live on the
-# site (Firebase); during the Thanksgiving games this also saves a backup copy
-# of the box scores every 5 minutes.
+# Every pick is a GitHub issue. This workflow reads new issues, records the
+# pick in data/league.json, replies on the issue, and redeploys the website.
+# During the Thanksgiving games it also saves box scores every 5 minutes.
 on:
+  issues:
+    types: [opened, reopened, edited]
   schedule:
     - cron: '*/5 17-23 26 11 *' # Thanksgiving, 12pm-7pm ET
     - cron: '*/5 0-5 27 11 *' # Thanksgiving night game
@@ -26,17 +28,12 @@ jobs:
     if: github.event_name != 'push' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     outputs:
-      deploy: ${{ steps.cfg.outputs.ready == 'true' && (steps.bot.outputs.changed == 'true' || github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+      deploy: ${{ steps.bot.outputs.changed == 'true' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # The live site needs its database address; until data/config.json has one,
-      # don't publish, so the site that's up keeps working.
-      - name: Check the live database is configured
-        id: cfg
-        run: echo "ready=$(node -e "process.stdout.write(require('./data/config.json').firebaseUrl ? 'true' : 'false')")" >> "$GITHUB_OUTPUT"
       - name: Test the draft rules
         if: github.event_name == 'push'
         run: npm test
@@ -51,7 +48,7 @@ jobs:
           cp -r index.html assets data _site/
           touch _site/.nojekyll
           # fresh asset URLs on every deploy so browsers never mix old and new files
-          sed -i "s/?v=dev/?v=${GITHUB_SHA::8}-${GITHUB_RUN_NUMBER}/g" _site/index.html _site/assets/app.js _site/assets/live.js
+          sed -i "s/?v=dev/?v=${GITHUB_SHA::8}-${GITHUB_RUN_NUMBER}/g" _site/index.html _site/assets/app.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

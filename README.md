@@ -6,8 +6,8 @@ A one-day fantasy football league for the three Thanksgiving games: Bears at Lio
 
 ## How to play
 
-1. **Join.** Open the site on the phone you'll draft with, type your name and a team name, and tap **Take my seat**. No accounts needed; the phone remembers your team.
-2. **Draft.** When all three seats are taken, the commissioner taps **Start the draft** and a random order spins onto everyone's screen. It's a snake draft (1-2-3, then 3-2-1) with no timer: as soon as one team picks, the next is up. On your turn, tap **Draft** next to a player and confirm. It shows up on every phone within a second or two, and the next person's phone buzzes.
+1. **Join.** Open the site, type a team name and tap **Join on GitHub**. GitHub opens with your team filled in; tap **Submit new issue**. You need a free [GitHub account](https://github.com/signup). Family without one can ask the commissioner to add them.
+2. **Draft.** When all three seats are taken, the commissioner taps **Start the draft**. The bot draws a random order and it spins onto everyone's screen. It's a snake draft (1-2-3, then 3-2-1) with no timer: as soon as one team picks, the next is up. On your turn, tap **Draft** next to a player, then **Submit** on GitHub. The league bot checks the pick, replies on your issue and updates the site, usually within a minute. GitHub also emails you when you're on the clock, and the site buzzes your phone if you've picked your team under "I'm drafting as".
 3. **Watch.** Points update live on the site during the games. The highest total after the night game wins.
 
 ### Roster and budget
@@ -34,19 +34,25 @@ Stats come from ESPN. Two-point conversions aren't counted.
 
 ## Commissioner guide
 
-The first person to set a PIN on the **How to play** tab becomes the commissioner; that PIN unlocks the commissioner tools on any phone. From there you can:
+The repo owner is the commissioner. Run the league by opening an issue with one of these titles:
 
-- **Start the draft** (spins the random order) once all seats are taken
-- **Add a team** for someone without a phone; you draft for them
-- **Remove a team** before the draft
-- **Pick for whoever is on the clock**
-- **Undo the last pick**, **Restart the draft** (keeps the teams), or **Clear everything**
+| Issue title | What it does |
+|---|---|
+| `ADD: Grandma's Gravy Boat` | Adds a team the commissioner drafts for (for family without GitHub) |
+| `ADD: Team name @username` | Saves a seat for a specific GitHub user |
+| `KICK: Team name` | Removes a team before the draft starts |
+| `START` | Spins a random draft order and opens the draft (the site's **Start the draft** button files this) |
+| `PICK: Player name` | Picks for whichever team is on the clock |
+| `UNDO` | Takes back the last pick |
+| `RESET` | Clears all picks, keeps the teams, and waits for a new `START` spin |
+| `RESET ALL` | Removes every team and pick (use after testing) |
+
+Anyone can open a `JOIN:` issue while seats are open. If a stranger grabs a seat, `KICK` them.
 
 ### How it works
 
 - `index.html` and `assets/` are the website, hosted on GitHub Pages.
-- Picks are live: every action (join, start, pick, undo) is saved as an event in a free Firebase Realtime Database (`data/config.json` holds its address). Every phone streams the events and replays them through the same draft rules in `assets/engine.js` (`assets/live.js`), so everyone sees the same league instantly, and if two phones grab the same player at once, the first to reach the database gets him.
-- The commissioner PIN and each phone's team are checked by the site, which keeps family members from picking for each other by accident. It isn't bank-grade security: someone who dug into the database could still mess with it.
 - `data/players.json` is the player pool with salaries (built from ESPN rosters and Sleeper projections by `npm run players`).
-- `.github/workflows/turkey-bowl.yml` redeploys the site on every push and, during the games, saves ESPN box scores to `data/scores.json` every 5 minutes as a backup; the site normally scores live straight from ESPN.
-- `npm test` runs the draft-rule, live-replay and scoring tests.
+- `data/league.json` holds teams and picks. Only the league bot changes it.
+- `.github/workflows/turkey-bowl.yml` runs `scripts/run.mjs` whenever an issue is opened. It applies the command with the rules in `assets/engine.js`, commits, redeploys the site and replies on the issue. During the games it also saves box scores to `data/scores.json` every 5 minutes as a backup; the site normally scores live straight from ESPN.
+- `npm test` runs the draft-rule and scoring tests.

@@ -336,18 +336,6 @@ button, input, select { font: inherit; color: inherit; }
 .board td.now { box-shadow: inset 0 0 0 3px var(--cranberry); color: var(--cranberry); }
 .board td.passed { color: var(--muted); font-style: italic; }
 
-/* Commissioner tools */
-.commish { border-left: 6px solid var(--cranberry) !important; }
-.commish-grid { display: grid; gap: 10px; margin-top: 12px; }
-.inline-form { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.commish-grid .inline-form { margin-top: 0; }
-.inline-form input, .inline-form select {
-  flex: 1 1 12rem; min-height: 42px; padding: 8px 14px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--surface-2);
-}
-.sheet-msg { color: var(--team-cranberry); font-weight: 600; }
-.whoami .chip { font-size: 0.95rem; }
-
 /* Account names wear a little turkey */
 .owner { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
 .turkey { width: 20px; height: 20px; flex: none; }

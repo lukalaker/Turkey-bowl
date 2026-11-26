@@ -274,7 +274,7 @@ function cleanName(s) {
 }
 
 function mention(league, team) {
-  return team.owner ? team.owner : `the commissioner, picking for ${team.name}`;
+  return team.owner ? `@${team.owner}` : `@${league.commissioner} (picking for ${team.name})`;
 }
 
 export function clockMessage(league) {
@@ -304,7 +304,7 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
     let name = arg;
     let owner = author;
     if (kind === 'add') {
-      if (!isCommish) return fail('Only the commissioner can add teams.');
+      if (!isCommish) return fail(`Only the commissioner (@${league.commissioner}) can add teams.`);
       const at = /\s@([A-Za-z0-9-]+)\s*$/.exec(` ${arg}`);
       owner = at ? at[1] : null;
       name = at ? arg.slice(0, arg.lastIndexOf('@')).trim() : arg;
@@ -324,18 +324,18 @@ export function applyCommand(league, players, cmd, rng = Math.random) {
     if (teamByName(league, name)) return fail(`There's already a team called ${name}. Pick another name.`);
     const team = { id: `t${league.teams.length + 1}`, name, owner, color: TEAM_COLORS[league.teams.length % TEAM_COLORS.length] };
     league.teams.push(team);
-    let message = `${name} joined the Turkey Bowl${owner ? ` (${owner})` : ' (the commissioner drafts for this team)'}.`;
+    let message = `${name} joined the Turkey Bowl${owner ? ` (@${owner})` : ' (the commissioner drafts for this team)'}.`;
     const seats = league.maxTeams - league.teams.length;
     if (seats > 0) {
       message += ` ${seats} seat${seats === 1 ? '' : 's'} left.`;
     } else {
-      message += ' Every seat is taken. When everyone is ready, the commissioner taps Start the draft and the order spins at random.';
+      message += `\n\nEvery seat is taken. @${league.commissioner}, tap Start the draft on the site when everyone's ready, and the draft order gets spun at random.`;
     }
     return done(message);
   }
 
   if (kind === 'start') {
-    if (!isCommish) return fail('Only the commissioner can start the draft.');
+    if (!isCommish) return fail(`Only the commissioner (@${league.commissioner}) can start the draft.`);
     if (league.status !== 'signup') return fail('The draft has already started. Use RESET to clear it first.');
     if (league.teams.length < league.maxTeams) {
       const seats = league.maxTeams - league.teams.length;
