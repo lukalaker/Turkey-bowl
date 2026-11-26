@@ -1,7 +1,7 @@
 {
   "name": "Turkey Bowl",
   "repo": "lukalaker/Turkey-bowl",
-  "commissioner": "lukalaker",
+  "commissioner": "commissioner",
   "cap": 100,
   "maxTeams": 3,
   "slots": [
@@ -15,25 +15,25 @@
     "K",
     "DEF"
   ],
-  "status": "drafting",
+  "status": "complete",
   "teams": [
     {
+      "color": "cranberry",
       "id": "t1",
       "name": "Winner",
-      "owner": "lukalaker",
-      "color": "cranberry"
+      "owner": "lukalaker"
     },
     {
+      "color": "pumpkin",
       "id": "t2",
       "name": "Austin",
-      "owner": "austinpaxton",
-      "color": "pumpkin"
+      "owner": "austinpaxton"
     },
     {
+      "color": "avocado",
       "id": "t3",
       "name": "Big Daddy",
-      "owner": "razorback1000",
-      "color": "avocado"
+      "owner": "razorback1000"
     }
   ],
   "order": [
@@ -41,21 +41,281 @@
     "t3",
     "t2"
   ],
-  "turn": 1,
+  "turn": 27,
   "picks": [
     {
-      "n": 1,
-      "turn": 0,
-      "team": "t1",
-      "player": "4241389",
-      "slot": "WR",
-      "salary": 17,
+      "at": "2026-11-26T02:49:30.000Z",
       "by": "lukalaker",
-      "at": "2026-11-26T02:49:30.000Z"
+      "n": 1,
+      "player": "4241389",
+      "salary": 17,
+      "slot": "WR",
+      "team": "t1",
+      "turn": 0
+    },
+    {
+      "n": 2,
+      "turn": 1,
+      "team": "t3",
+      "player": "4361579",
+      "slot": "RB",
+      "salary": 17,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:19:26.089Z"
+    },
+    {
+      "n": 3,
+      "turn": 2,
+      "team": "t2",
+      "player": "4832955",
+      "slot": "RB",
+      "salary": 16,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:20:33.910Z"
+    },
+    {
+      "n": 4,
+      "turn": 3,
+      "team": "t2",
+      "player": "4426354",
+      "slot": "WR",
+      "salary": 11,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:20:48.913Z"
+    },
+    {
+      "n": 5,
+      "turn": 4,
+      "team": "t3",
+      "player": "4259545",
+      "slot": "RB",
+      "salary": 12,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:22:10.184Z"
+    },
+    {
+      "n": 6,
+      "turn": 5,
+      "team": "t1",
+      "player": "4379399",
+      "slot": "RB",
+      "salary": 15,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:22:14.417Z"
+    },
+    {
+      "n": 7,
+      "turn": 6,
+      "team": "t1",
+      "player": "4685278",
+      "slot": "WR",
+      "salary": 14,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:22:46.649Z"
+    },
+    {
+      "n": 8,
+      "turn": 7,
+      "team": "t3",
+      "player": "5083754",
+      "slot": "WR",
+      "salary": 5,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:23:44.141Z"
+    },
+    {
+      "n": 9,
+      "turn": 8,
+      "team": "t2",
+      "player": "4429795",
+      "slot": "RB",
+      "salary": 26,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:23:47.673Z"
+    },
+    {
+      "n": 10,
+      "turn": 9,
+      "team": "t2",
+      "player": "3918298",
+      "slot": "QB",
+      "salary": 19,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:24:08.590Z"
+    },
+    {
+      "n": 11,
+      "turn": 10,
+      "team": "t3",
+      "player": "4374302",
+      "slot": "WR",
+      "salary": 19,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:25:51.086Z"
+    },
+    {
+      "n": 12,
+      "turn": 11,
+      "team": "t1",
+      "player": "4688813",
+      "slot": "FLEX",
+      "salary": 4,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:26:29.157Z"
+    },
+    {
+      "n": 13,
+      "turn": 12,
+      "team": "t1",
+      "player": "3929630",
+      "slot": "RB",
+      "salary": 13,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:27:00.599Z"
+    },
+    {
+      "n": 14,
+      "turn": 13,
+      "team": "t3",
+      "player": "2577417",
+      "slot": "QB",
+      "salary": 18,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:27:51.392Z"
+    },
+    {
+      "n": 15,
+      "turn": 14,
+      "team": "t2",
+      "player": "4723086",
+      "slot": "TE",
+      "salary": 9,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:27:56.269Z"
+    },
+    {
+      "n": 16,
+      "turn": 15,
+      "team": "t2",
+      "player": "4373678",
+      "slot": "WR",
+      "salary": 5,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:28:36.809Z"
+    },
+    {
+      "n": 17,
+      "turn": 16,
+      "team": "t3",
+      "player": "4431299",
+      "slot": "FLEX",
+      "salary": 10,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:29:29.506Z"
+    },
+    {
+      "n": 18,
+      "turn": 17,
+      "team": "t1",
+      "player": "3139477",
+      "slot": "QB",
+      "salary": 14,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:29:42.830Z"
+    },
+    {
+      "n": 19,
+      "turn": 18,
+      "team": "t1",
+      "player": "3953687",
+      "slot": "K",
+      "salary": 5,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:30:32.601Z"
+    },
+    {
+      "n": 20,
+      "turn": 19,
+      "team": "t3",
+      "player": "15847",
+      "slot": "TE",
+      "salary": 7,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:31:02.691Z"
+    },
+    {
+      "n": 21,
+      "turn": 20,
+      "team": "t2",
+      "player": "3915416",
+      "slot": "FLEX",
+      "salary": 7,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:31:42.712Z"
+    },
+    {
+      "n": 22,
+      "turn": 21,
+      "team": "t2",
+      "player": "4689936",
+      "slot": "K",
+      "salary": 4,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:32:22.704Z"
+    },
+    {
+      "n": 23,
+      "turn": 22,
+      "team": "t3",
+      "player": "17427",
+      "slot": "K",
+      "salary": 4,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:32:46.255Z"
+    },
+    {
+      "n": 24,
+      "turn": 23,
+      "team": "t1",
+      "player": "DEF-CHI",
+      "slot": "DEF",
+      "salary": 3,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:33:26.845Z"
+    },
+    {
+      "n": 25,
+      "turn": 24,
+      "team": "t1",
+      "player": "4430027",
+      "slot": "TE",
+      "salary": 10,
+      "by": "lukalaker",
+      "at": "2026-11-26T03:33:37.739Z"
+    },
+    {
+      "n": 26,
+      "turn": 25,
+      "team": "t3",
+      "player": "DEF-DAL",
+      "slot": "DEF",
+      "salary": 4,
+      "by": "razorback1000",
+      "at": "2026-11-26T03:33:56.172Z"
+    },
+    {
+      "n": 27,
+      "turn": 26,
+      "team": "t2",
+      "player": "DEF-BUF",
+      "slot": "DEF",
+      "salary": 3,
+      "by": "austinpaxton",
+      "at": "2026-11-26T03:34:04.724Z"
     }
   ],
   "passes": [],
   "startedAt": "2026-11-26T02:48:28.000Z",
-  "completedAt": null,
-  "updatedAt": "2026-11-26T02:49:30.000Z"
+  "completedAt": "2026-11-26T03:34:04.724Z",
+  "updatedAt": "2026-11-26T03:34:04.724Z"
 }

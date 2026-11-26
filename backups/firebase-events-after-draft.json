@@ -1,0 +1,245 @@
+{
+  "-P7KqHqUt6wHkywlnGVq": {
+    "at": 1795662884257,
+    "league": {
+      "cap": 100,
+      "commissioner": "lukalaker",
+      "maxTeams": 3,
+      "name": "Turkey Bowl",
+      "order": [
+        "t1",
+        "t3",
+        "t2"
+      ],
+      "picks": [
+        {
+          "at": "2026-11-26T02:49:30.000Z",
+          "by": "lukalaker",
+          "n": 1,
+          "player": "4241389",
+          "salary": 17,
+          "slot": "WR",
+          "team": "t1",
+          "turn": 0
+        }
+      ],
+      "repo": "lukalaker/Turkey-bowl",
+      "slots": [
+        "QB",
+        "RB",
+        "RB",
+        "WR",
+        "WR",
+        "TE",
+        "FLEX",
+        "K",
+        "DEF"
+      ],
+      "startedAt": "2026-11-26T02:48:28.000Z",
+      "status": "drafting",
+      "teams": [
+        {
+          "color": "cranberry",
+          "id": "t1",
+          "name": "Winner",
+          "owner": "lukalaker"
+        },
+        {
+          "color": "pumpkin",
+          "id": "t2",
+          "name": "Austin",
+          "owner": "austinpaxton"
+        },
+        {
+          "color": "avocado",
+          "id": "t3",
+          "name": "Big Daddy",
+          "owner": "razorback1000"
+        }
+      ],
+      "turn": 1,
+      "updatedAt": "2026-11-26T02:49:30.000Z"
+    },
+    "type": "import"
+  },
+  "-P7KqfopMSkfNzGE_U5S": {
+    "at": 1795662986550,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "pin": "f95a6bc9e39cfb773967b3fdae2118893b0554ea40976933cf9403e60c9a5571",
+    "type": "setpin"
+  },
+  "-P7Kr93ZLAmbZvvsOJhw": {
+    "at": 1795663110436,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "team": "t1",
+    "type": "claim"
+  },
+  "-P7KrDcmglKdj43eCp6w": {
+    "at": 1795663129138,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "team": "t3",
+    "type": "claim"
+  },
+  "-P7KrMe8QNY3sh5Z5Rcj": {
+    "at": 1795663166089,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "4361579",
+    "type": "pick"
+  },
+  "-P7KrQTr5z_Ou4KGUfbe": {
+    "at": 1795663181751,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "team": "t2",
+    "type": "claim"
+  },
+  "-P7KrcCqyfxzzOm3om7T": {
+    "at": 1795663233910,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "4832955",
+    "type": "pick"
+  },
+  "-P7KrfsGa_wzx5-Dg15y": {
+    "at": 1795663248913,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "4426354",
+    "type": "pick"
+  },
+  "-P7Krzi75Q-LQlHhAfH-": {
+    "at": 1795663330184,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "4259545",
+    "type": "pick"
+  },
+  "-P7Ks-kGDgz_QHtUiVAQ": {
+    "at": 1795663334417,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "4379399",
+    "type": "pick"
+  },
+  "-P7Ks7btHPr0ZAcSJPLJ": {
+    "at": 1795663366649,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "4685278",
+    "type": "pick"
+  },
+  "-P7KsLeCr_8KEwUkSGnB": {
+    "at": 1795663424141,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "5083754",
+    "type": "pick"
+  },
+  "-P7KsMWO_a3stFE0dB25": {
+    "at": 1795663427673,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "4429795",
+    "type": "pick"
+  },
+  "-P7KsRcDaXKr-kZnNf8Z": {
+    "at": 1795663448590,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "3918298",
+    "type": "pick"
+  },
+  "-P7KspdhYJQInZPcjy-Q": {
+    "at": 1795663551086,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "4374302",
+    "type": "pick"
+  },
+  "-P7Ksyw_-2u8E6QHLosE": {
+    "at": 1795663589157,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "4688813",
+    "type": "pick"
+  },
+  "-P7Kt5bqq8WXSlHhtiWz": {
+    "at": 1795663620599,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "3929630",
+    "type": "pick"
+  },
+  "-P7KtI0Ui4zc4vu5kHQS": {
+    "at": 1795663671392,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "2577417",
+    "type": "pick"
+  },
+  "-P7KtJChVIg4p8CAOdvi": {
+    "at": 1795663676269,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "4723086",
+    "type": "pick"
+  },
+  "-P7KtT67ElQmCPAFTSZ8": {
+    "at": 1795663716809,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "4373678",
+    "type": "pick"
+  },
+  "-P7KteyXbh3OgCXS2pLf": {
+    "at": 1795663769506,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "4431299",
+    "type": "pick"
+  },
+  "-P7KtiDi1dZ0z3souHLu": {
+    "at": 1795663782830,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "3139477",
+    "type": "pick"
+  },
+  "-P7KtuNOZa1v-0OKU8jk": {
+    "at": 1795663832601,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "3953687",
+    "type": "pick"
+  },
+  "-P7Ku0iYn8uv04OgfpWt": {
+    "at": 1795663862691,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "15847",
+    "type": "pick"
+  },
+  "-P7KuAUrv6l_5tEbq4EO": {
+    "at": 1795663902712,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "3915416",
+    "type": "pick"
+  },
+  "-P7KuKFjLdlIoH1fOVsU": {
+    "at": 1795663942704,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "4689936",
+    "type": "pick"
+  },
+  "-P7KuQ-jc7bLeztDpnDs": {
+    "at": 1795663966255,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "17427",
+    "type": "pick"
+  },
+  "-P7KuZuwhbZkX8COdfv3": {
+    "at": 1795664006845,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "DEF-CHI",
+    "type": "pick"
+  },
+  "-P7Kub_AweA1TCK_Fl9e": {
+    "at": 1795664017739,
+    "key": "11756cc6abc326bbadc7c8e26ae0e3e5cb56efb0d68f62e86325f9122ca7ce1b",
+    "player": "4430027",
+    "type": "pick"
+  },
+  "-P7Kug4Bc5X9XNk5YUwF": {
+    "at": 1795664036172,
+    "key": "640a8bca94737995910f4e44a925460bdcaedd871a77057b03e90a6572b1536e",
+    "player": "DEF-DAL",
+    "type": "pick"
+  },
+  "-P7Kui9oRNeh00_k-9-b": {
+    "at": 1795664044724,
+    "key": "1cb2bfe68316ebf7f0f1887574988c0e8195466849b01994813e8189de477d54",
+    "player": "DEF-BUF",
+    "type": "pick"
+  }
+}
