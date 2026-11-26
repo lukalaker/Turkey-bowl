@@ -1,5 +1,5 @@
-import { POS_LABEL, buildState, onClock, checkPick, maxBid, snakeIndex, slotsFor } from './engine.js';
-import { scoreSummary, pointsFor, fetchSummary, ESPN_API, RULES } from './scoring.js';
+import { POS_LABEL, buildState, onClock, checkPick, maxBid, snakeIndex, slotsFor } from './engine.js?v=dev';
+import { scoreSummary, pointsFor, fetchSummary, ESPN_API, RULES } from './scoring.js?v=dev';
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const esc = (s) =>
