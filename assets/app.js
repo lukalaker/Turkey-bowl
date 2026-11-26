@@ -1,5 +1,6 @@
 import { POS_LABEL, buildState, onClock, checkPick, maxBid, snakeIndex, slotsFor } from './engine.js?v=dev';
 import { scoreSummary, pointsFor, fetchSummary, ESPN_API, RULES } from './scoring.js?v=dev';
+import { fold, connect, sha256, cleanPerson } from './live.js?v=dev';
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const esc = (s) =>
@@ -30,7 +31,16 @@ const S = {
   scored: {}, // gameId -> scoreSummary()
   board: {}, // gameId -> { state, detail, scores: {ABBR: n} }
   tab: null,
-  me: store.get('tb.me') || '',
+  me: '', // the team this phone joined with (from its key)
+  db: null, // live database connection
+  events: {},
+  results: {},
+  myKey: '',
+  myKeyHash: '',
+  myPin: '',
+  myPinHash: '',
+  waiting: null, // { id, kind, done(result) } for the action this phone just sent
+  status: 'connecting',
   pos: 'ALL',
   q: '',
   hideTaken: store.get('tb.hideTaken') !== '0',
@@ -51,22 +61,55 @@ const fmtTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: 'numeric',
 const pts = (n) => (Math.round((n ?? 0) * 10) / 10).toFixed(1);
 const gameOf = (p) => S.games.find((g) => g.id === p.game);
 
-function repo() {
-  if (S.league?.repo) return S.league.repo;
-  const owner = location.hostname.split('.')[0];
-  const name = location.pathname.split('/').filter(Boolean)[0] ?? 'Turkey-bowl';
-  return `${owner}/${name}`;
-}
-function issueUrl(title, body) {
-  return `https://github.com/${repo()}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
-}
 function teamById(id) {
   return S.league?.teams.find((t) => t.id === id) ?? null;
 }
 function ownerLabel(t) {
   return t.owner
-    ? `<span class="owner">${TURKEY}@${esc(t.owner)}</span>`
+    ? `<span class="owner">${TURKEY}${esc(t.owner)}</span>`
     : `<span class="owner">Commissioner drafts</span>`;
+}
+/** Is this phone unlocked as the commissioner? */
+function isCommish() {
+  return !!S.league?.pinHash && S.myPinHash === S.league.pinHash;
+}
+/** Can this phone make the pick right now? */
+function canPickNow() {
+  const L = S.league;
+  if (L?.status !== 'drafting') return false;
+  const clock = onClock(L);
+  return !!clock && (clock.id === S.me || isCommish());
+}
+
+/* ---------- sending actions to the live league ---------- */
+function randomKey() {
+  const a = new Uint8Array(16);
+  crypto.getRandomValues(a);
+  return [...a].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+async function send(kind, event) {
+  if (!S.db) {
+    toast('The live league is not connected yet. Check your connection and reload.');
+    return null;
+  }
+  const body = { type: kind, key: S.myKeyHash, ...event };
+  if (S.myPinHash) body.pin = S.myPinHash;
+  return new Promise((resolve) => {
+    S.db
+      .post(body)
+      .then((id) => {
+        const result = S.results[id];
+        if (result) resolve(result);
+        else S.waiting = { id, done: resolve };
+      })
+      .catch((err) => resolve({ ok: false, message: err.message }));
+    setTimeout(() => {
+      if (S.waiting?.done === resolve) {
+        S.waiting = null;
+        resolve({ ok: false, message: 'No answer from the league yet. Check your connection; if it went through, it will show up in a moment.' });
+      }
+    }, 15000);
+  });
 }
 function gameState(g) {
   const b = S.board[g.id];
@@ -122,14 +165,14 @@ async function loadJSON(path) {
   return res.json();
 }
 
-function setLeague(next) {
+function setLeague(next, quiet = false) {
   const text = JSON.stringify(next);
   if (text === S.leagueText) return false;
   const prev = S.league;
   S.league = next;
   S.leagueText = text;
-  if (S.me && !teamById(S.me)) S.me = '';
-  if (prev) {
+  S.me = next.teams.find((t) => t.keyHash && t.keyHash === S.myKeyHash)?.id ?? '';
+  if (prev && !quiet) {
     const fresh = next.picks.slice(prev.picks.length);
     const last = fresh[fresh.length - 1];
     const before = onClock(prev);
@@ -145,16 +188,6 @@ function setLeague(next) {
       toast("You're on the clock!");
     }
     if (myTurn) navigator.vibrate?.([120, 80, 120]);
-    if (S.pending) {
-      const done =
-        (S.pending.kind === 'pick' && next.picks.some((x) => x.player === S.pending.player)) ||
-        (S.pending.kind === 'join' && next.teams.length > prev.teams.length) ||
-        (S.pending.kind === 'start' && next.status !== 'signup');
-      if (done) {
-        S.pending = null;
-        $('#sheet').open && $('#sheet').close();
-      }
-    }
   }
   // A freshly spun draft order plays once on every device that sees it early on.
   const early = next.picks.length < next.order.length * 2;
@@ -221,12 +254,21 @@ function showSpin() {
   el.querySelector('button').addEventListener('click', () => el.remove());
 }
 
-async function refreshLeague() {
-  try {
-    if (setLeague(await loadJSON('data/league.json'))) render();
-  } catch (e) {
-    console.warn(e);
+/** New events from the live database: replay them and refresh the page. */
+function onEvents(events) {
+  S.events = events;
+  const { league, results } = fold(events, S.players, { repo: '' });
+  S.results = results;
+  // The first answer from the database is the league as it already stands: no "just drafted" toasts.
+  const quiet = !S.dbLoaded;
+  if (S.db) S.dbLoaded = true;
+  const changed = setLeague(league, quiet);
+  if (S.waiting && results[S.waiting.id]) {
+    const w = S.waiting;
+    S.waiting = null;
+    w.done(results[w.id]);
   }
+  if (changed) render();
 }
 
 function useBackupScores(sc) {
@@ -329,7 +371,7 @@ function renderHero() {
     const n = L.teams.length;
     el.innerHTML =
       n >= L.maxTeams
-        ? `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>Every seat is taken.</strong> Waiting for @${esc(L.commissioner)} to spin the draft order.</p>`
+        ? `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>Every seat is taken.</strong> Waiting for the commissioner to spin the draft order.</p>`
         : `<p class="hero-tagline">Three seats at the table, one day of football, winner takes all. <strong>${n} of ${L.maxTeams}</strong> seats are taken. First kickoff ${first ? fmtTime(first.kickoff) : ''}.</p>`;
     return;
   }
@@ -380,7 +422,7 @@ function playerRows() {
   const st = buildState(L, S.players);
   const clock = onClock(L);
   const drafting = L.status === 'drafting';
-  const myTurn = drafting && (!S.me || S.me === clock?.id);
+  const myTurn = canPickNow();
   const t = now();
   const list = filtered().filter((p) => !(S.hideTaken && st.ownerOf[p.id]));
   if (!list.length) return `<li class="empty-note">No players match. Try another position or clear the search.</li>`;
@@ -417,6 +459,21 @@ function picksUntil(L, teamId) {
   return null;
 }
 
+/** "Which team is yours?" for a phone that hasn't claimed a team, when some team has no phone yet. */
+function claimHTML() {
+  const L = S.league;
+  if (S.me || L.status === 'complete') return '';
+  const open = L.teams.filter((t) => !t.keyHash);
+  if (!open.length) return '';
+  return `<section class="section panel claim">
+      <h2>Which team is yours?</h2>
+      <p class="lede">Tap your team once and this phone drafts for it. Just watching? Skip this.</p>
+      <div class="claim-list">${open
+        .map((t) => `<button type="button" class="claim-btn" data-claim="${esc(t.id)}" data-color="${esc(t.color)}"><b>${esc(t.name)}</b>${ownerLabel(t)}</button>`)
+        .join('')}</div>
+    </section>`;
+}
+
 function topHTML() {
   const L = S.league;
   const st = buildState(L, S.players);
@@ -430,25 +487,32 @@ function topHTML() {
           : `<li class="empty"><b>Open seat</b><span>Waiting for a family member</span></li>`,
       );
     }
+    const mine = teamById(S.me);
     if (L.teams.length >= L.maxTeams) {
+      const startCtl = isCommish()
+        ? `<div><button class="btn" type="button" id="start-draft">Start the draft</button></div>`
+        : `<p class="hint">Only the commissioner can start it${L.pinHash ? '' : ' (set up on the How to play tab)'}.</p>`;
       return `<section class="section join panel">
         <div><h2>Everyone's at the table</h2>
         <p class="lede">All ${L.maxTeams} seats are taken. When the family is ready, the commissioner starts the draft and the order spins at random on everyone's screen.</p></div>
-        <div><button class="btn" type="button" id="start-draft">Start the draft</button></div>
-        <p class="hint">Only the commissioner, @${esc(L.commissioner)}, can start it. GitHub opens with START filled in; tap Submit and the spin begins within a minute.</p>
+        ${startCtl}
         <ul class="seats">${seats.join('')}</ul>
       </section>
       <section class="section"><h2>Players and prices</h2><p class="lede">Prices are set. Plan your plate while you wait.</p></section>`;
     }
+    const joinBlock = mine
+      ? `<p class="lede">You're in as <b>${esc(mine.name)}</b>. Waiting for ${L.maxTeams - L.teams.length} more. Want a different team name? Type it below.</p>`
+      : `<p class="lede">Type your name and a team name to claim a seat. When all ${L.maxTeams} seats are taken, the commissioner starts the draft and the order spins at random.</p>`;
     return `<section class="section join panel">
-        <div><h2>Take a seat at the table</h2>
-        <p class="lede">Name your team and claim a seat. When all ${L.maxTeams} seats are taken, the commissioner starts the draft and the order spins at random.</p></div>
+        <div><h2>Take a seat at the table</h2>${joinBlock}</div>
         <form id="join-form">
+          <label class="sr-only" for="person-name">Your name</label>
+          <input id="person-name" name="person" maxlength="24" required placeholder="Your name" autocomplete="given-name" value="${esc(mine?.owner ?? '')}">
           <label class="sr-only" for="team-name">Team name</label>
           <input id="team-name" name="team" maxlength="32" required placeholder="Team name, like Gravy Train" autocomplete="off">
-          <button class="btn" type="submit">Join on GitHub</button>
+          <button class="btn" type="submit">${mine ? 'Rename my team' : 'Take my seat'}</button>
         </form>
-        <p class="hint">You need a free GitHub account. GitHub opens with your team filled in; tap Submit and you're in within a minute. No GitHub? Ask the commissioner, @${esc(L.commissioner)}, to add your team.</p>
+        <p class="hint">Use the phone you'll draft on: it remembers your team. Someone without a phone? The commissioner can add a team and draft for them.</p>
         <ul class="seats">${seats.join('')}</ul>
       </section>
       <section class="section"><h2>Players and prices</h2><p class="lede">Prices are set. Plan your plate while the seats fill up.</p></section>`;
@@ -458,9 +522,14 @@ function topHTML() {
   }
   const clock = onClock(L);
   const team = st.teams[clock.id];
-  const who = `<div class="whoami"><span class="label">I'm drafting as</span><div class="seg">${L.teams
-    .map((t) => `<button type="button" data-me="${esc(t.id)}" data-color="${esc(t.color)}" aria-pressed="${S.me === t.id}">${esc(t.name)}</button>`)
-    .join('')}</div></div>`;
+  const me = teamById(S.me);
+  const who = `<p class="whoami">${
+    me
+      ? `<span class="chip" data-color="${esc(me.color)}">${esc(me.name)}</span><span class="label">is your team on this phone${isCommish() ? ", and you're the commissioner" : ''}.</span>`
+      : isCommish()
+        ? `<span class="label">You're the commissioner: you can pick for whoever is on the clock.</span>`
+        : `<span class="label">You're watching. This phone hasn't joined a team.</span>`
+  }</p>`;
   let status;
   if (S.me && S.me !== clock.id) {
     const k = picksUntil(L, S.me);
@@ -472,7 +541,7 @@ function topHTML() {
   } else {
     const mb = maxBid(L, S.players, clock.id, now(), st);
     status = `<div class="status" data-color="${esc(clock.color)}">
-      <p class="big">${S.me ? "You're on the clock." : `${esc(clock.name)} is on the clock.`}</p>
+      <p class="big">${S.me === clock.id ? "You're on the clock." : isCommish() ? `${esc(clock.name)} is on the clock. You can pick for them.` : `${esc(clock.name)} is on the clock.`}</p>
       <p>$${team.left} left for ${team.open.length} spot${team.open.length === 1 ? '' : 's'}${mb > 0 ? `, so you can spend up to $${mb} on this pick` : ''}.</p>
       <div class="needs">${team.open.map((s) => `<span>${POS_LABEL[s]}</span>`).join('')}</div></div>`;
   }
@@ -482,7 +551,7 @@ function topHTML() {
 function renderPlayers(full) {
   const view = $('#view');
   if (full || !$('#pv-list')) {
-    view.innerHTML = `<div id="pv-top">${topHTML()}</div>
+    view.innerHTML = `<div id="pv-top">${claimHTML()}${topHTML()}</div>
       <div class="filters">
         <div class="pos-filter" role="group" aria-label="Position">${POSITIONS.map(
           (p) => `<button type="button" data-pos="${p}" aria-pressed="${S.pos === p}">${FILTER_LABEL[p] ?? p}</button>`,
@@ -493,7 +562,7 @@ function renderPlayers(full) {
       </div>
       <ul class="players" id="pv-list"></ul>`;
   } else {
-    $('#pv-top').innerHTML = topHTML();
+    $('#pv-top').innerHTML = claimHTML() + topHTML();
   }
   $('#pv-list').innerHTML = playerRows();
 }
@@ -599,13 +668,14 @@ function renderRules() {
   $('#view').innerHTML = `<div class="rules">
     <section><h2>How to play</h2>
       <ol class="steps">
-        <li><b>Join.</b> Name your team on the Players tab and submit it on GitHub. You need a free GitHub account. Family without one can ask the commissioner, @${esc(L.commissioner)}, to add them.</li>
-        <li><b>Draft.</b> Once ${L.maxTeams} teams are in, the commissioner taps Start the draft and the order spins at random. It's a snake draft (1-2-3, then 3-2-1) with no timer: as soon as one team picks, the next is up. On your turn, tap Draft, then Submit on GitHub. The league bot checks the pick and replies within a minute.</li>
+        <li><b>Join.</b> On the Players tab, type your name and a team name and tap Take my seat. Use the phone you'll draft on; it remembers your team. Family without a phone can have the commissioner add a team and draft for them.</li>
+        <li><b>Draft.</b> Once ${L.maxTeams} teams are in, the commissioner taps Start the draft and the order spins at random. It's a snake draft (1-2-3, then 3-2-1) with no timer: as soon as one team picks, the next is up. On your turn, tap Draft next to a player, then confirm. It shows up on everyone's phone right away.</li>
         <li><b>Watch.</b> Your players score during Thursday's three games. Highest total after the night game wins it all.</li>
       </ol></section>
     <div class="cols">
       <section><h3>Your roster and budget</h3>
         <p>Every team gets <b>$${L.cap}</b> for ${slotsFor(L).length} spots: QB, RB, RB, WR, WR, TE, Flex (RB, WR or TE), K and D/ST.</p>
+        <p>There's no bench: your ${slotsFor(L).length} picks are your lineup. You can only draft a position while you still have an open spot for it, so one QB, one K and one D/ST each, and a third RB or WR or a second TE only fits in the Flex. Players you have no spot for show "No spot".</p>
         <p>Every player belongs to one team only. Once he's drafted, he's gone.</p>
         <p>You always have to keep enough money to fill your other spots with the cheapest players left. The status box shows the most you can spend on each pick.</p>
         <p>Players lock when their game kicks off.</p>
@@ -631,12 +701,54 @@ function renderRules() {
           ${row('D/ST allows 28-34 / 35+', '-1 / -4')}
         </tbody></table></section>
     </div>
-    <section><h3>Commissioner tools</h3>
-      <p>The commissioner (@${esc(L.commissioner)}) runs the league by opening issues with these titles:</p>
-      <p><code>ADD: Grandma's Gravy Boat</code> adds a team the commissioner drafts for. <code>ADD: Team name @username</code> saves a seat for someone on GitHub.</p>
-      <p><code>KICK: Team name</code> removes a team before the draft. <code>UNDO</code> takes back the last pick. <code>RESET</code> clears the draft and redraws the order. <code>RESET ALL</code> removes every team and pick so you can start over.</p>
-      <p>The commissioner can also submit a pick for whichever team is on the clock.</p></section>
+    ${commishHTML()}
   </div>`;
+}
+
+function commishHTML() {
+  const L = S.league;
+  if (!L.pinHash) {
+    return `<section class="commish" id="commish"><h3>Commissioner tools</h3>
+      <p>Whoever runs the league sets a PIN here first. It unlocks starting the draft, undoing picks, adding teams for family without a phone, and resets.</p>
+      <form class="inline-form" data-form="setpin">
+        <label class="sr-only" for="pin-new">New commissioner PIN</label>
+        <input id="pin-new" name="pin" inputmode="numeric" minlength="4" maxlength="12" required placeholder="Pick a PIN, 4+ digits" autocomplete="off">
+        <button class="btn" type="submit">Become commissioner</button>
+      </form></section>`;
+  }
+  if (!isCommish()) {
+    return `<section class="commish" id="commish"><h3>Commissioner tools</h3>
+      <p>The commissioner unlocks these with the PIN on their phone.</p>
+      <form class="inline-form" data-form="unlock">
+        <label class="sr-only" for="pin-enter">Commissioner PIN</label>
+        <input id="pin-enter" name="pin" inputmode="numeric" maxlength="12" required placeholder="Commissioner PIN" autocomplete="off">
+        <button class="btn quiet" type="submit">Unlock</button>
+      </form></section>`;
+  }
+  const signup = L.status === 'signup';
+  const full = L.teams.length >= L.maxTeams;
+  const kickOptions = L.teams.map((t) => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+  return `<section class="commish" id="commish"><h3>Commissioner tools</h3>
+    <p>You're the commissioner on this phone. You can also pick for whichever team is on the clock.</p>
+    <div class="commish-grid">
+      ${signup && full ? `<div><button class="btn" type="button" id="start-draft">Start the draft</button></div>` : ''}
+      ${signup && !full ? `<form class="inline-form" data-form="add">
+        <label class="sr-only" for="add-team">Team name for someone without a phone</label>
+        <input id="add-team" name="team" maxlength="32" required placeholder="Add a team you'll draft for" autocomplete="off">
+        <button class="btn quiet" type="submit">Add team</button></form>` : ''}
+      ${signup && L.teams.length ? `<form class="inline-form" data-form="kick">
+        <label class="sr-only" for="kick-team">Team to remove</label>
+        <select id="kick-team" name="team">${kickOptions}</select>
+        <button class="btn quiet" type="submit">Remove team</button></form>` : ''}
+      ${L.picks.length ? `<div><button class="btn quiet" type="button" data-commish="undo">Undo the last pick</button></div>` : ''}
+      ${L.status !== 'signup' ? `<div><button class="btn quiet" type="button" data-commish="reset">Restart the draft (keep teams)</button></div>` : ''}
+      <div><button class="btn quiet" type="button" data-commish="reset-all">Clear everything (all teams and picks)</button></div>
+      ${L.teams.some((t) => t.keyHash) ? `<form class="inline-form" data-form="unclaim">
+        <label class="sr-only" for="unclaim-team">Team to release from its phone</label>
+        <select id="unclaim-team" name="team">${L.teams.filter((t) => t.keyHash).map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select>
+        <button class="btn quiet" type="submit">Release from its phone</button></form>` : ''}
+      <div><button class="btn quiet" type="button" data-commish="lock">Lock commissioner tools on this phone</button></div>
+    </div></section>`;
 }
 
 /* ---------- sheet ---------- */
@@ -650,18 +762,29 @@ function openPickSheet(playerId) {
     return;
   }
   const open = buildState(L, S.players).teams[clock.id].open.length - 1;
-  const url = issueUrl(
-    `PICK: ${p.name} (${p.team} ${POS_LABEL[p.pos]}) #${p.id}`,
-    `Tap **Submit new issue** (or **Create**) to lock in this pick for ${clock.name}.\n\nThe league bot replies here within a minute.`,
-  );
-  $('#sheet-body').innerHTML = `<h2 id="sheet-title">Draft ${esc(p.name)}?</h2>
+  const forWho = clock.id === S.me ? '' : ` for ${esc(clock.name)}`;
+  $('#sheet-body').innerHTML = `<h2 id="sheet-title">Draft ${esc(p.name)}${forWho}?</h2>
     <p>${esc(p.team)} ${POS_LABEL[p.pos]} at ${POS_LABEL[r.slot]} for $${r.price}${r.bargain ? ` from the bargain bin (he lists at $${p.salary})` : ''}. ${esc(clock.name)} would have $${r.leftAfter} left for ${open} spot${open === 1 ? '' : 's'}.</p>
-    <p class="hint">GitHub opens with the pick filled in. Tap Submit there and the league bot locks it in.</p>
+    <p class="sheet-msg" role="status" hidden></p>
     <div class="actions"><button class="btn quiet" value="cancel">Cancel</button>
-    <a class="btn" id="go" href="${esc(url)}" target="_blank" rel="noopener">Open GitHub to submit</a></div>`;
-  $('#go').addEventListener('click', () => {
-    S.pending = { kind: 'pick', player: playerId };
-    waitingSheet(`${p.name} goes to ${clock.name} as soon as the league bot sees your GitHub issue. This page updates by itself.`);
+    <button class="btn" type="button" id="go">Draft ${esc(p.name.split(' ').slice(-1)[0])}</button></div>`;
+  $('#go').addEventListener('click', async () => {
+    const go = $('#go');
+    if (go.dataset.failed) return $('#sheet').close();
+    go.disabled = true;
+    go.textContent = 'Drafting…';
+    const result = await send('pick', { player: playerId });
+    if (result?.ok) {
+      $('#sheet').close();
+      toast(`${p.name} is yours${forWho ? ` (${clock.name})` : ''}!`);
+    } else if (result) {
+      const msg = $('.sheet-msg');
+      msg.hidden = false;
+      msg.textContent = result.message;
+      go.textContent = 'Pick someone else';
+      go.dataset.failed = '1';
+      go.disabled = false;
+    }
   });
   $('#sheet').showModal();
 }
@@ -689,11 +812,23 @@ function openPointsSheet(playerId) {
   $('#sheet').showModal();
 }
 
-function waitingSheet(text) {
-  $('#sheet-body').innerHTML = `<h2 id="sheet-title">Waiting for the league bot</h2><p>${esc(text)}</p>
-    <p class="hint">If GitHub says something went wrong, the bot's reply on your issue explains why.</p>
-    <div class="actions"><button class="btn quiet" value="close">Close</button></div>`;
-  if (!$('#sheet').open) $('#sheet').showModal();
+function confirmSheet(title, text, label, onYes) {
+  $('#sheet-body').innerHTML = `<h2 id="sheet-title">${esc(title)}</h2><p>${esc(text)}</p>
+    <div class="actions"><button class="btn quiet" value="cancel">Cancel</button>
+    <button class="btn" type="button" id="yes">${esc(label)}</button></div>`;
+  $('#yes').addEventListener('click', async () => {
+    $('#yes').disabled = true;
+    $('#sheet').close();
+    await onYes();
+  });
+  $('#sheet').showModal();
+}
+
+/** Send a commissioner/join action and report how it went. */
+async function act(kind, event, okText) {
+  const result = await send(kind, event);
+  if (result) toast(result.ok ? okText ?? result.message.split('\n')[0] : result.message);
+  return result;
 }
 
 /* ---------- render + events ---------- */
@@ -739,14 +874,36 @@ function bind() {
   const view = $('#view');
   view.addEventListener('click', (e) => {
     if (e.target.closest('[data-replay]')) return showSpin();
-    if (e.target.closest('#start-draft')) {
-      window.open(
-        issueUrl('START', 'Tap **Submit new issue** (or **Create**) to start the Turkey Bowl draft. The league bot spins a random draft order and replies here within a minute.'),
-        '_blank',
-        'noopener',
+    const claim = e.target.closest('[data-claim]');
+    if (claim) {
+      const t = teamById(claim.dataset.claim);
+      if (!t) return;
+      return confirmSheet(`Is ${t.name} your team?`, `This phone will draft for ${t.name}. Each team can only be on one phone.`, "Yes, that's mine", () =>
+        act('claim', { team: t.id }, `${t.name} is yours on this phone!`),
       );
-      S.pending = { kind: 'start' };
-      return waitingSheet('The draft order spins on everyone\'s screen as soon as the league bot sees your GitHub issue. This page updates by itself.');
+    }
+    if (e.target.closest('#start-draft')) {
+      const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+      return act('start', { seed }, 'The draft order is spun!');
+    }
+    const cmd = e.target.closest('[data-commish]')?.dataset.commish;
+    if (cmd === 'undo') {
+      const last = S.league.picks.at(-1);
+      const p = last ? S.byId[last.player] : null;
+      return confirmSheet('Undo the last pick?', `${p?.name ?? 'The last player'} goes back into the pool and ${teamById(last?.team)?.name ?? 'that team'} is back on the clock.`, 'Undo pick', () => act('undo', {}, 'Pick undone.'));
+    }
+    if (cmd === 'reset') {
+      return confirmSheet('Restart the draft?', 'Every pick is cleared. The teams stay seated, and you spin a new order with Start the draft.', 'Restart draft', () => act('reset', {}, 'Draft restarted. Teams are still seated.'));
+    }
+    if (cmd === 'reset-all') {
+      return confirmSheet('Clear everything?', 'Every team and every pick is removed and all seats open up again. Your commissioner PIN stays.', 'Clear everything', () => act('reset', { arg: 'all' }, 'League cleared. Every seat is open.'));
+    }
+    if (cmd === 'lock') {
+      S.myPin = '';
+      S.myPinHash = '';
+      store.set('tb.pin', '');
+      toast('Commissioner tools locked on this phone.');
+      return render(true);
     }
     const team = e.target.closest('[data-team]');
     if (team) {
@@ -759,12 +916,6 @@ function bind() {
     if (draft) return openPickSheet(draft.dataset.draft);
     const points = e.target.closest('[data-points]');
     if (points) return openPointsSheet(points.dataset.points);
-    const me = e.target.closest('[data-me]');
-    if (me) {
-      S.me = S.me === me.dataset.me ? '' : me.dataset.me;
-      store.set('tb.me', S.me);
-      return render();
-    }
     const pos = e.target.closest('[data-pos]');
     if (pos) {
       S.pos = pos.dataset.pos;
@@ -785,18 +936,54 @@ function bind() {
       $('#pv-list').innerHTML = playerRows();
     }
   });
-  view.addEventListener('submit', (e) => {
-    if (e.target.id !== 'join-form') return;
+  view.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = new FormData(e.target).get('team').toString().trim();
-    if (!name) return;
-    window.open(
-      issueUrl(`JOIN: ${name}`, `Tap **Submit new issue** (or **Create**) to join the Turkey Bowl as **${name}**.\n\nThe league bot replies here within a minute.`),
-      '_blank',
-      'noopener',
-    );
-    S.pending = { kind: 'join' };
-    waitingSheet(`${name} joins as soon as the league bot sees your GitHub issue. This page updates by itself.`);
+    const form = e.target;
+    const data = new FormData(form);
+    const button = form.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    try {
+      if (form.id === 'join-form') {
+        const person = cleanPerson(data.get('person'));
+        const team = String(data.get('team') ?? '').trim();
+        if (!person || !team) return;
+        const r = await act('join', { by: person, arg: team }, `You're in as ${team}!`);
+        if (r?.ok) form.reset();
+      } else if (form.dataset.form === 'setpin' || form.dataset.form === 'unlock') {
+        const pin = String(data.get('pin') ?? '').trim();
+        if (pin.length < 4) return toast('Use at least 4 digits.');
+        const hash = await sha256(`tb-pin:${pin}`);
+        if (form.dataset.form === 'setpin') {
+          S.myPin = pin;
+          S.myPinHash = hash;
+          const r = await act('setpin', { pin: hash }, "PIN set. You're the commissioner on this phone.");
+          if (!r?.ok) {
+            S.myPin = '';
+            S.myPinHash = '';
+          } else store.set('tb.pin', pin);
+        } else if (hash === S.league.pinHash) {
+          S.myPin = pin;
+          S.myPinHash = hash;
+          store.set('tb.pin', pin);
+          toast('Commissioner tools unlocked on this phone.');
+        } else {
+          toast("That PIN doesn't match.");
+        }
+        render(true);
+      } else if (form.dataset.form === 'add') {
+        const team = String(data.get('team') ?? '').trim();
+        if (team) await act('add', { arg: team }, `${team} added. You'll draft for them.`);
+      } else if (form.dataset.form === 'unclaim') {
+        const id = String(data.get('team') ?? '');
+        const t = teamById(id);
+        if (t) await act('unclaim', { team: id }, `${t.name} can be claimed again. Tell them to tap "Which team is yours?".`);
+      } else if (form.dataset.form === 'kick') {
+        const team = String(data.get('team') ?? '');
+        if (team) await act('kick', { arg: team }, `${team} removed.`);
+      }
+    } finally {
+      if (button?.isConnected) button.disabled = false;
+    }
   });
   // fall back to the team logo when a headshot is missing
   document.addEventListener(
@@ -811,9 +998,6 @@ function bind() {
     },
     true,
   );
-  $('#sheet').addEventListener('close', () => {
-    if ($('#sheet').returnValue === 'cancel') S.pending = null;
-  });
 }
 
 function loop(fn, ms) {
@@ -825,17 +1009,26 @@ function loop(fn, ms) {
 }
 
 async function init() {
+  let config;
   try {
-    const [pool, league] = await Promise.all([loadJSON('data/players.json'), loadJSON('data/league.json')]);
+    const [pool, cfg] = await Promise.all([loadJSON('data/players.json'), loadJSON('data/config.json')]);
     S.players = pool.players;
     S.games = pool.games;
     S.byId = Object.fromEntries(pool.players.map((p) => [p.id, p]));
-    setLeague(league);
+    config = cfg;
   } catch (e) {
     $('#hero-body').innerHTML = `<p class="hero-tagline">The league data didn't load. Check your connection and refresh the page.</p>`;
     console.error(e);
     return;
   }
+  // This phone's identity: a random key made once and kept on the phone.
+  S.myKey = store.get('tb.key') || randomKey();
+  store.set('tb.key', S.myKey);
+  S.myKeyHash = await sha256(`tb-key:${S.myKey}`);
+  S.myPin = store.get('tb.pin') || '';
+  if (S.myPin) S.myPinHash = await sha256(`tb-pin:${S.myPin}`);
+
+  onEvents({}); // an empty league until the database answers
   try {
     useBackupScores(await loadJSON('data/scores.json'));
   } catch {
@@ -843,12 +1036,16 @@ async function init() {
   }
   bind();
   render(true);
+  if (config?.firebaseUrl) {
+    S.db = connect(config.firebaseUrl, onEvents, (status) => (S.status = status));
+  } else {
+    $('#hero-body').innerHTML = `<p class="hero-tagline">The live league database isn't connected yet.</p>`;
+  }
   refreshScores();
-  loop(refreshLeague, () => (S.pending ? 5000 : 15000));
   loop(refreshScores, 30000);
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
-      refreshLeague();
+      S.db?.reload().catch(() => {});
       refreshScores();
     }
   });
