@@ -22,6 +22,12 @@
       "name": "Winner",
       "owner": "lukalaker",
       "color": "cranberry"
+    },
+    {
+      "id": "t2",
+      "name": "Austin",
+      "owner": "austinpaxton",
+      "color": "pumpkin"
     }
   ],
   "order": [],
@@ -30,5 +36,5 @@
   "passes": [],
   "startedAt": null,
   "completedAt": null,
-  "updatedAt": "2026-11-26T02:45:12.000Z"
+  "updatedAt": "2026-11-26T02:46:35.000Z"
 }
