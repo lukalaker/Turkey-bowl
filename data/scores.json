@@ -1,1 +1,1249 @@
-{"updatedAt":null,"games":{}}
+{
+  "updatedAt": "2026-11-27T00:54:34.989Z",
+  "games": {
+    "401873080": {
+      "state": "in",
+      "detail": "7:37 - 4th",
+      "scores": {
+        "DAL": {
+          "score": 38,
+          "homeAway": "home",
+          "id": "6"
+        },
+        "PHI": {
+          "score": 30,
+          "homeAway": "away",
+          "id": "21"
+        }
+      },
+      "players": {
+        "14950": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "2577417": {
+          "pts": 26.22,
+          "line": "16/24, 258 pass yds, 2 pass TD, 2 car, 19 rush yds, 1 rush TD",
+          "breakdown": [
+            {
+              "label": "Passing yards",
+              "detail": "258 yds × 0.04",
+              "pts": 10.32
+            },
+            {
+              "label": "Passing TDs",
+              "detail": "2 × 4",
+              "pts": 8
+            },
+            {
+              "label": "Rushing yards",
+              "detail": "19 yds × 0.1",
+              "pts": 1.9
+            },
+            {
+              "label": "Rushing TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            }
+          ]
+        },
+        "3050478": {
+          "pts": 6,
+          "line": "1/1 FG, 3/3 XP",
+          "breakdown": [
+            {
+              "label": "Field goals made",
+              "detail": "1 × 3",
+              "pts": 3
+            },
+            {
+              "label": "Extra points made",
+              "detail": "3 × 1",
+              "pts": 3
+            }
+          ]
+        },
+        "3121023": {
+          "pts": 1.9,
+          "line": "1 rec, 9 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "9 yds × 0.1",
+              "pts": 0.9
+            }
+          ]
+        },
+        "3122752": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3139368": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3676833": {
+          "pts": 11.1,
+          "line": "1 car, 10 rush yds, 1 rec, 31 yds, 1 rec TD",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "10 yds × 0.1",
+              "pts": 1
+            },
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "31 yds × 0.1",
+              "pts": 3.1
+            },
+            {
+              "label": "Receiving TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            }
+          ]
+        },
+        "3916409": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3926231": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3929630": {
+          "pts": 0.7,
+          "line": "5 car, 7 rush yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "7 yds × 0.1",
+              "pts": 0.7
+            }
+          ]
+        },
+        "3953687": {
+          "pts": 8,
+          "line": "1/1 FG, 5/5 XP",
+          "breakdown": [
+            {
+              "label": "Field goals made",
+              "detail": "1 × 3",
+              "pts": 3
+            },
+            {
+              "label": "Extra points made",
+              "detail": "5 × 1",
+              "pts": 5
+            }
+          ]
+        },
+        "4035239": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4040982": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4043089": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4046523": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4218312": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4240456": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4241389": {
+          "pts": 20.4,
+          "line": "7 rec, 134 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "7 × 1",
+              "pts": 7
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "134 yds × 0.1",
+              "pts": 13.4
+            }
+          ]
+        },
+        "4241478": {
+          "pts": 39.6,
+          "line": "9 rec, 186 yds, 2 rec TD",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "9 × 1",
+              "pts": 9
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "186 yds × 0.1",
+              "pts": 18.6
+            },
+            {
+              "label": "Receiving TDs",
+              "detail": "2 × 6",
+              "pts": 12
+            }
+          ]
+        },
+        "4241921": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4245185": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4259546": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4360590": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4360698": {
+          "pts": 25.38,
+          "line": "15/20, 247 pass yds, 2 pass TD, 3 car, 15 rush yds, 1 rush TD",
+          "breakdown": [
+            {
+              "label": "Passing yards",
+              "detail": "247 yds × 0.04",
+              "pts": 9.88
+            },
+            {
+              "label": "Passing TDs",
+              "detail": "2 × 4",
+              "pts": 8
+            },
+            {
+              "label": "Rushing yards",
+              "detail": "15 yds × 0.1",
+              "pts": 1.5
+            },
+            {
+              "label": "Rushing TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            }
+          ]
+        },
+        "4361579": {
+          "pts": 31.6,
+          "line": "23 car, 84 rush yds, 2 rush TD, 3 rec, 22 yds, 1 rec TD",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "84 yds × 0.1",
+              "pts": 8.4
+            },
+            {
+              "label": "Rushing TDs",
+              "detail": "2 × 6",
+              "pts": 12
+            },
+            {
+              "label": "Receptions",
+              "detail": "3 × 1",
+              "pts": 3
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "22 yds × 0.1",
+              "pts": 2.2
+            },
+            {
+              "label": "Receiving TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            }
+          ]
+        },
+        "4362088": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4362116": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4367210": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4372414": {
+          "pts": 3.5,
+          "line": "1 rec, 25 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "25 yds × 0.1",
+              "pts": 2.5
+            }
+          ]
+        },
+        "4372519": {
+          "pts": 1.9,
+          "line": "4 car, 19 rush yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "19 yds × 0.1",
+              "pts": 1.9
+            }
+          ]
+        },
+        "4384549": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4426331": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4426354": {
+          "pts": 9.2,
+          "line": "4 rec, 52 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "4 × 1",
+              "pts": 4
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "52 yds × 0.1",
+              "pts": 5.2
+            }
+          ]
+        },
+        "4426506": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4428914": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4428992": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4429249": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4431545": {
+          "pts": 4.6,
+          "line": "10 car, 46 rush yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "46 yds × 0.1",
+              "pts": 4.6
+            }
+          ]
+        },
+        "4432777": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4567123": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4569586": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4571162": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4595352": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4602197": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4682618": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4683848": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4685287": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4685400": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4685759": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4686273": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4686566": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4691903": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4715355": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4808759": {
+          "pts": 2.9,
+          "line": "1 rec, 19 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "19 yds × 0.1",
+              "pts": 1.9
+            }
+          ]
+        },
+        "4870706": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4870795": {
+          "pts": 6.7,
+          "line": "4 rec, 27 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "4 × 1",
+              "pts": 4
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "27 yds × 0.1",
+              "pts": 2.7
+            }
+          ]
+        },
+        "4870960": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "5095865": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        }
+      },
+      "dst": {
+        "PHI": {
+          "pts": 4,
+          "line": "38 pts allowed, 2 sacks, 1 TD",
+          "breakdown": [
+            {
+              "label": "Points allowed",
+              "detail": "38 (35+ tier)",
+              "pts": -4
+            },
+            {
+              "label": "Sacks",
+              "detail": "2 × 1",
+              "pts": 2
+            },
+            {
+              "label": "Defense and return TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            }
+          ]
+        },
+        "DAL": {
+          "pts": 3,
+          "line": "30 pts allowed, 4 sacks",
+          "breakdown": [
+            {
+              "label": "Points allowed",
+              "detail": "30 (28-34 tier)",
+              "pts": -1
+            },
+            {
+              "label": "Sacks",
+              "detail": "4 × 1",
+              "pts": 4
+            }
+          ]
+        }
+      }
+    },
+    "401873081": {
+      "state": "post",
+      "detail": "Final",
+      "scores": {
+        "DET": {
+          "score": 35,
+          "homeAway": "home",
+          "id": "8"
+        },
+        "CHI": {
+          "score": 39,
+          "homeAway": "away",
+          "id": "3"
+        }
+      },
+      "players": {
+        "17427": {
+          "pts": 7,
+          "line": "1/1 FG, 4/4 XP",
+          "breakdown": [
+            {
+              "label": "Field goals made",
+              "detail": "1 × 3",
+              "pts": 3
+            },
+            {
+              "label": "Extra points made",
+              "detail": "4 × 1",
+              "pts": 4
+            }
+          ]
+        },
+        "2576492": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "2580216": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "2973405": {
+          "pts": 5,
+          "line": "3 rec, 20 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "3 × 1",
+              "pts": 3
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "20 yds × 0.1",
+              "pts": 2
+            }
+          ]
+        },
+        "3046779": {
+          "pts": 15.82,
+          "line": "25/36, 313 pass yds, 1 pass TD, 1 INT, 3 car, 10 rush yds",
+          "breakdown": [
+            {
+              "label": "Passing yards",
+              "detail": "313 yds × 0.04",
+              "pts": 12.52
+            },
+            {
+              "label": "Passing TDs",
+              "detail": "1 × 4",
+              "pts": 4
+            },
+            {
+              "label": "Interceptions thrown",
+              "detail": "1 × -2",
+              "pts": -2
+            },
+            {
+              "label": "Rushing yards",
+              "detail": "10 yds × 0.1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "3 yds × 0.1",
+              "pts": 0.3
+            }
+          ]
+        },
+        "3121544": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3134690": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3139387": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3910229": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3915486": {
+          "pts": 1.9,
+          "line": "1 rec, 9 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "9 yds × 0.1",
+              "pts": 0.9
+            }
+          ]
+        },
+        "3916370": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3916577": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "3948283": {
+          "pts": 5,
+          "line": "2 rec, 30 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "2 × 1",
+              "pts": 2
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "30 yds × 0.1",
+              "pts": 3
+            }
+          ]
+        },
+        "4035369": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4036261": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4036507": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4241007": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4241217": {
+          "pts": 0,
+          "line": "0 rec, 0 yds",
+          "breakdown": []
+        },
+        "4241411": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4242392": {
+          "pts": 0,
+          "line": "0 rec, 0 yds",
+          "breakdown": []
+        },
+        "4242521": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4243253": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4243315": {
+          "pts": 8.7,
+          "line": "3 car, 50 rush yds, 2 rec, 17 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "50 yds × 0.1",
+              "pts": 5
+            },
+            {
+              "label": "Receptions",
+              "detail": "2 × 1",
+              "pts": 2
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "17 yds × 0.1",
+              "pts": 1.7
+            }
+          ]
+        },
+        "4245144": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4259181": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4259545": {
+          "pts": 29.2,
+          "line": "9 car, 65 rush yds, 1 rush TD, 7 rec, 97 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "65 yds × 0.1",
+              "pts": 6.5
+            },
+            {
+              "label": "Rushing TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            },
+            {
+              "label": "Receptions",
+              "detail": "7 × 1",
+              "pts": 7
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "97 yds × 0.1",
+              "pts": 9.7
+            }
+          ]
+        },
+        "4260409": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4360383": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4361662": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4361861": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4361939": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4365629": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4371973": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4372459": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4372576": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4374302": {
+          "pts": 21.6,
+          "line": "7 rec, 146 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "7 × 1",
+              "pts": 7
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "146 yds × 0.1",
+              "pts": 14.6
+            }
+          ]
+        },
+        "4383429": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4426388": {
+          "pts": 14,
+          "line": "1 car, 12 rush yds, 6 rec, 68 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "12 yds × 0.1",
+              "pts": 1.2
+            },
+            {
+              "label": "Receptions",
+              "detail": "6 × 1",
+              "pts": 6
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "68 yds × 0.1",
+              "pts": 6.8
+            }
+          ]
+        },
+        "4429067": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4429795": {
+          "pts": 48.2,
+          "line": "21 car, 205 rush yds, 3 rush TD, 5 rec, 47 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "205 yds × 0.1",
+              "pts": 20.5
+            },
+            {
+              "label": "Rushing TDs",
+              "detail": "3 × 6",
+              "pts": 18
+            },
+            {
+              "label": "Receptions",
+              "detail": "5 × 1",
+              "pts": 5
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "47 yds × 0.1",
+              "pts": 4.7
+            }
+          ]
+        },
+        "4430027": {
+          "pts": 14.4,
+          "line": "4 rec, 44 yds, 1 rec TD",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "4 × 1",
+              "pts": 4
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "44 yds × 0.1",
+              "pts": 4.4
+            },
+            {
+              "label": "Receiving TDs",
+              "detail": "1 × 6",
+              "pts": 6
+            }
+          ]
+        },
+        "4430822": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4431299": {
+          "pts": 26.7,
+          "line": "6 rec, 87 yds, 2 rec TD",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "6 × 1",
+              "pts": 6
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "87 yds × 0.1",
+              "pts": 8.7
+            },
+            {
+              "label": "Receiving TDs",
+              "detail": "2 × 6",
+              "pts": 12
+            }
+          ]
+        },
+        "4431611": {
+          "pts": 23.3,
+          "line": "30/44, 345 pass yds, 2 pass TD, 3 car, 15 rush yds",
+          "breakdown": [
+            {
+              "label": "Passing yards",
+              "detail": "345 yds × 0.04",
+              "pts": 13.8
+            },
+            {
+              "label": "Passing TDs",
+              "detail": "2 × 4",
+              "pts": 8
+            },
+            {
+              "label": "Rushing yards",
+              "detail": "15 yds × 0.1",
+              "pts": 1.5
+            }
+          ]
+        },
+        "4431615": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4586333": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4608686": {
+          "pts": 15.9,
+          "line": "8 car, 15 rush yds, 2 rush TD, 1 rec, 14 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "15 yds × 0.1",
+              "pts": 1.5
+            },
+            {
+              "label": "Rushing TDs",
+              "detail": "2 × 6",
+              "pts": 12
+            },
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "14 yds × 0.1",
+              "pts": 1.4
+            }
+          ]
+        },
+        "4683553": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4685278": {
+          "pts": 7.5,
+          "line": "1 car, 1 rush yds, 3 rec, 44 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "1 yds × 0.1",
+              "pts": 0.1
+            },
+            {
+              "label": "Receptions",
+              "detail": "3 × 1",
+              "pts": 3
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "44 yds × 0.1",
+              "pts": 4.4
+            }
+          ]
+        },
+        "4685442": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4685461": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4685504": {
+          "pts": 8.1,
+          "line": "5 rec, 31 yds",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "5 × 1",
+              "pts": 5
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "31 yds × 0.1",
+              "pts": 3.1
+            }
+          ]
+        },
+        "4686889": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4689936": {
+          "pts": 9,
+          "line": "2/2 FG, 3/4 XP",
+          "breakdown": [
+            {
+              "label": "Field goals made",
+              "detail": "2 × 3",
+              "pts": 6
+            },
+            {
+              "label": "Extra points made",
+              "detail": "3 × 1",
+              "pts": 3
+            }
+          ]
+        },
+        "4692025": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4723086": {
+          "pts": -0.5,
+          "line": "1 rec, 5 yds, 1 fumble lost",
+          "breakdown": [
+            {
+              "label": "Receptions",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "5 yds × 0.1",
+              "pts": 0.5
+            },
+            {
+              "label": "Fumbles lost",
+              "detail": "1 × -2",
+              "pts": -2
+            }
+          ]
+        },
+        "4869748": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4870953": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4879561": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4911952": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "4912274": {
+          "pts": 3.5,
+          "line": "6 car, 19 rush yds, 2 rec, -4 yds",
+          "breakdown": [
+            {
+              "label": "Rushing yards",
+              "detail": "19 yds × 0.1",
+              "pts": 1.9
+            },
+            {
+              "label": "Receptions",
+              "detail": "2 × 1",
+              "pts": 2
+            },
+            {
+              "label": "Receiving yards",
+              "detail": "-4 yds × 0.1",
+              "pts": -0.4
+            }
+          ]
+        },
+        "4954445": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "5123663": {
+          "pts": 0,
+          "line": "0 rec, 0 yds",
+          "breakdown": []
+        },
+        "5143915": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "5144894": {
+          "pts": 0,
+          "line": "",
+          "breakdown": []
+        },
+        "5160110": {
+          "pts": 0,
+          "line": "0 rec, 0 yds",
+          "breakdown": []
+        }
+      },
+      "dst": {
+        "CHI": {
+          "pts": -1,
+          "line": "35 pts allowed, 1 sack, 1 INT",
+          "breakdown": [
+            {
+              "label": "Points allowed",
+              "detail": "35 (35+ tier)",
+              "pts": -4
+            },
+            {
+              "label": "Sacks",
+              "detail": "1 × 1",
+              "pts": 1
+            },
+            {
+              "label": "Interceptions",
+              "detail": "1 × 2",
+              "pts": 2
+            }
+          ]
+        },
+        "DET": {
+          "pts": 2,
+          "line": "39 pts allowed, 4 sacks, 1 fum rec",
+          "breakdown": [
+            {
+              "label": "Points allowed",
+              "detail": "39 (35+ tier)",
+              "pts": -4
+            },
+            {
+              "label": "Sacks",
+              "detail": "4 × 1",
+              "pts": 4
+            },
+            {
+              "label": "Fumble recoveries",
+              "detail": "1 × 2",
+              "pts": 2
+            }
+          ]
+        }
+      }
+    }
+  }
+}
